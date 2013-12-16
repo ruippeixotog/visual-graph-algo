@@ -309,11 +309,14 @@ function keydown() {
   if(!selected_node && !selected_link) return;
   switch(d3.event.keyCode) {
     case 8: // backspace
+      d3.event.preventDefault();
+      
     case 46: // delete
       if(selected_node) {
         nodes.splice(nodes.indexOf(selected_node), 1);
         spliceLinksForNode(selected_node);
         graph.removeNode(selected_node.id);
+
       } else if(selected_link) {
         links.splice(links.indexOf(selected_link), 1);
         graph.removeEdge(
