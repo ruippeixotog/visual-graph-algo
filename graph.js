@@ -2,7 +2,31 @@
 var graph = {
   numNodes: graphDef[0][0],
   numEdges: graphDef[0][1],
-  adjs: []
+  adjs: [],
+
+  addNode: function() {
+    graph.adjs.push([]);
+    return graph.numNodes++;
+  },
+
+  removeNode: function(id) {
+    graph.adjs[id].forEach(function(adj) {
+      graph.adjs[adj].splice(graph.adjs[adj].indexOf(id), 1);
+    });
+    graph.adjs[id] = null;
+  },
+
+  addEdge: function(src, dest) {
+    graph.adjs[src].push(dest);
+    graph.adjs[dest].push(src);
+    ++graph.numEdges;
+  },
+
+  removeEdge: function(src, dest) {
+    graph.adjs[src].splice(graph.adjs[src].indexOf(dest), 1);
+    graph.adjs[dest].splice(graph.adjs[dest].indexOf(src), 1);
+    --graph.numEdges;
+  }
 }
 
 for(var i = 0; i < graph.numNodes; i++)

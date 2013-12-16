@@ -37,12 +37,21 @@ path.link.hidden {
 
 circle.node {
   stroke-width: 1.5px;
+  stroke: black;
   cursor: pointer;
+  fill: #dddddd;
 }
 
-circle.node.reflexive {
-  stroke: #000 !important;
-  stroke-width: 2.5px;
+circle.node.selected {
+  fill: #eeeeee;
+}
+
+circle.node.current {
+  fill: red;
+}
+
+circle.node.visited {
+  fill: #666666;
 }
 
 text {

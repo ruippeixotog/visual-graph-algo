@@ -1,6 +1,7 @@
 
-function changeColor(nodeid, color) {
-  $("circle[nodeid=" + nodeid + "]").css("fill", color);
+function changeState(nodeid, from, to) {
+  svg.selectAll('circle[data-nodeid="' + nodeid + '"]')
+    .classed(from, false).classed(to, true);
 }
 
 function* bfs(src) {
@@ -14,9 +15,9 @@ function* bfs(src) {
   while(q.length > 0) {
     var curr = q.shift();
 
-    changeColor(curr, "red");
+    changeState(curr, "", "current");
     yield 0;
-    changeColor(curr, "#666666");
+    changeState(curr, "current", "visited");
 
     graph.adjs[curr].forEach(function(adj) {
       if(!found[adj]) {
