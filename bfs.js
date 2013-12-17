@@ -1,4 +1,9 @@
 
+function resetState()  {
+  svg.selectAll('circle.node')
+    .classed("current", false).classed("visited", false);
+}
+
 function changeState(nodeid, from, to) {
   svg.selectAll('circle[data-nodeid="' + nodeid + '"]')
     .classed(from, false).classed(to, true);
@@ -27,13 +32,17 @@ function* bfs(src) {
   }
 }
 
-var algo;
-var finished = false;
+var algo, finished;
 
 $(function() {
   $("#start").click(function() {
     var startAt = Number($("#startAt").val());
     algo = bfs(startAt);
+
+    finished = false;
+    resetState();
+
+    $("#next").click();
   });
 
   $("#next").click(function() {

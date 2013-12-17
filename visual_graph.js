@@ -1,7 +1,6 @@
 // set up SVG for D3
 var width  = window.innerWidth - 8 * 2,
-    height = window.innerHeight,
-    colors = d3.scale.linear().domain([1, 10]).range(["#eeeeee", "#eeeeee"]);// colors = d3.scale.category10();
+    height = 600;
 
 var svg = d3.select('body')
   .append('svg')
@@ -310,7 +309,7 @@ function keydown() {
   switch(d3.event.keyCode) {
     case 8: // backspace
       d3.event.preventDefault();
-      
+
     case 46: // delete
       if(selected_node) {
         nodes.splice(nodes.indexOf(selected_node), 1);
