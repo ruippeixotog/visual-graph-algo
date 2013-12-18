@@ -14,7 +14,7 @@ var svg = d3.select('body')
 var d3graph = {
   nodes: [],
   links: [],
-  directed: true
+  directed: false
 }
 
 for(var i = 0; i < graph.numNodes; i++) {
@@ -24,8 +24,8 @@ for(var i = 0; i < graph.numNodes; i++) {
 for(var i = 1; i <= graph.numEdges; i++) {
   d3graph.links.push({
     source: d3graph.nodes[graphDef[i][0] - 1],
-    target: d3graph.nodes[graphDef[i][1] - 1],
-    left: false, right: true });
+    target: d3graph.nodes[graphDef[i][1] - 1]
+  });
 }
 
 // init D3 force layout
@@ -91,8 +91,8 @@ function tick() {
         dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
         normX = deltaX / dist,
         normY = deltaY / dist,
-        sourcePadding = d.left ? 17 : 12,
-        targetPadding = d.right ? 17 : 12,
+        sourcePadding = 12,
+        targetPadding = d3graph.directed ? 17 : 12,
         sourceX = d.source.x + (sourcePadding * normX),
         sourceY = d.source.y + (sourcePadding * normY),
         targetX = d.target.x - (targetPadding * normX),
@@ -112,16 +112,14 @@ function restart() {
 
   // update existing links
   path.classed('selected', function(d) { return d === selected_link; })
-    .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
-    .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; });
+    .style('marker-end', d3graph.directed ? 'url(#end-arrow)' : '');
 
 
   // add new links
   path.enter().append('svg:path')
     .attr('class', 'link')
     .classed('selected', function(d) { return d === selected_link; })
-    .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
-    .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })
+    .style('marker-end', d3graph.directed ? 'url(#end-arrow)' : '')
     .on('mousedown', function(d) {
       if(d3.event.ctrlKey) return;
 
@@ -197,27 +195,17 @@ function restart() {
 
       // add link to graph (update if exists)
       // NB: links are strictly source < target; arrows separately specified by booleans
-      var source, target, direction;
-      if(mousedown_node.id < mouseup_node.id) {
-        source = mousedown_node;
-        target = mouseup_node;
-        direction = 'right';
-      } else {
-        source = mouseup_node;
-        target = mousedown_node;
-        direction = 'left';
-      }
+      var source = mousedown_node,
+          target = mouseup_node;
 
       var link;
       link = d3graph.links.filter(function(l) {
-        return (l.source === source && l.target === target);
+        return (l.source === source && l.target === target) ||
+          (!d3graph.directed && l.source === target && l.target === source);
       })[0];
 
-      if(link) {
-        link[direction] = true;
-      } else {
-        link = {source: source, target: target, left: false, right: false};
-        link[direction] = true;
+      if(!link) {
+        link = { source: source, target: target };
         d3graph.links.push(link);
         graph.addEdge(source.id, target.id);
       }
@@ -316,7 +304,7 @@ function keydown() {
 
     case 46: // delete
       if(selected_node) {
-        d3graph.nodes.splice(nodes.indexOf(selected_node), 1);
+        d3graph.nodes.splice(d3graph.nodes.indexOf(selected_node), 1);
         spliceLinksForNode(selected_node);
         graph.removeNode(selected_node.id);
 

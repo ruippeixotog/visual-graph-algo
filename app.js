@@ -21,7 +21,8 @@ $(function() {
     if(finished) alert("Finished!");
   });
 
-  $("directed").change(function() {
-    
+  $("#directed").change(function() {
+    d3graph.directed = $(this).is(":checked");
+    restart();
   });
 });
