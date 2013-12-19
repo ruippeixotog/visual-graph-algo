@@ -1,11 +1,13 @@
 // set up SVG for D3
-var width  = window.innerWidth - 8 * 2,
+var width  = 800,
     height = 600;
 
 var svg = d3.select('body')
   .append('svg')
-  .attr('width', width)
-  .attr('height', height);
+  .attr('width', '100%')
+  .attr('height', '75%')
+  .attr('viewBox', '0 0 ' + width + ' ' + height)
+  .attr('preserveAspectRatio', 'xMidYMid');
 
 // set up initial nodes and links
 //  - nodes are known by 'id', not by index in array.
