@@ -7,7 +7,7 @@ $(function() {
     algo = bfs(startAt);
 
     finished = false;
-    resetState();
+    graphView.resetNodes();
 
     $("#next").click();
   });
@@ -22,7 +22,7 @@ $(function() {
   });
 
   $("#directed").change(function() {
-    d3graph.directed = $(this).is(":checked");
+    graphView.setDirected($(this).is(":checked"));
     restart();
   });
 });
