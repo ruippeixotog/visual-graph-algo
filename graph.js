@@ -38,6 +38,41 @@ function newGraph(graphDef) {
       if(!this.directed)
         this.adjs[dest].splice(this.adjs[dest].indexOf(src), 1);
       this.numEdges--;
+    },
+
+    isDirected: function() {
+      return this.directed;
+    },
+
+    setDirected: function(value) {
+      if(this.directed == value) return;
+      if(!value) {
+        var found = new Array(this.numNodes);
+        for (var i = 0; i < this.numNodes; i++)
+          found[i] = false;
+
+        for (var i = 0; i < this.numNodes; i++) {
+          if(this.adjs[i] == null || found[i]) continue;
+          var q = [{ id: i, parent: null }];
+
+          while(q.length > 0) {
+            var curr = q.shift();
+            if(found[curr.id]) continue;
+            found[curr.id] = true;
+
+            var foundParent = false;
+            this.adjs[curr.id].forEach(function(adj) {
+              q.push({ id: adj, parent: curr.id });
+              if(adj == curr.parent) foundParent = true;
+            });
+            if(curr.parent != null && !foundParent)
+              this.addEdge(curr.id, curr.parent);
+          }
+        }
+      } else {
+        this.numEdges *= 2;
+      }
+      this.directed = value;
     }
   };
 

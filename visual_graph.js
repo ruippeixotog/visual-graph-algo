@@ -1,5 +1,5 @@
 
-function newGraphView(parent) {
+function newGraphView(parent, graph) {
   // set up SVG for D3
   var width  = 800,
       height = 600;
@@ -17,20 +17,45 @@ function newGraphView(parent) {
 
   var d3graph = {
     nodes: [],
-    links: [],
-    directed: false
+    links: []
   }
 
-  for(var i = 0; i < graph.numNodes; i++) {
-    d3graph.nodes.push({ id: i });
+  function sync() {
+    nodesById = {};
+    linksByIds = {};
+
+    for(var i in d3graph.nodes)
+      nodesById[d3graph.nodes[i].id] = d3graph.nodes[i];
+
+    for(var i in d3graph.links) {
+      var src = d3graph.links[i].source.id;
+      var tgt = d3graph.links[i].target.id;
+      linksByIds[[src, tgt]] = d3graph.links[i];
+    }
+
+    d3graph.nodes.length = 0;
+    d3graph.links.length = 0;
+
+    for(var i = 0; i < graph.numNodes; i++) {
+      if(graph.adjs[i] != null)
+        d3graph.nodes.push(nodesById[i] || { id: i });
+    }
+
+    for(var i = 0; i <= graph.numNodes; i++) {
+      for(var j in graph.adjs[i]) {
+        if(!graph.isDirected() && i < graph.adjs[i][j])
+          continue;
+
+        d3graph.links.push(
+          linksByIds[[i, graph.adjs[i][j]]] || {
+          source: d3graph.nodes[i],
+          target: d3graph.nodes[graph.adjs[i][j]]
+        });
+      }
+    }
   }
 
-  for(var i = 1; i <= graph.numEdges; i++) {
-    d3graph.links.push({
-      source: d3graph.nodes[graphDef[i][0] - 1],
-      target: d3graph.nodes[graphDef[i][1] - 1]
-    });
-  }
+  sync();
 
   // init D3 force layout
   var force = d3.layout.force()
@@ -96,7 +121,7 @@ function newGraphView(parent) {
           normX = deltaX / dist,
           normY = deltaY / dist,
           sourcePadding = 12,
-          targetPadding = d3graph.directed ? 17 : 12,
+          targetPadding = graph.isDirected() ? 17 : 12,
           sourceX = d.source.x + (sourcePadding * normX),
           sourceY = d.source.y + (sourcePadding * normY),
           targetX = d.target.x - (targetPadding * normX),
@@ -116,14 +141,14 @@ function newGraphView(parent) {
 
     // update existing links
     path.classed('selected', function(d) { return d === selected_link; })
-      .style('marker-end', d3graph.directed ? 'url(#end-arrow)' : '');
+      .style('marker-end', graph.isDirected() ? 'url(#end-arrow)' : '');
 
 
     // add new links
     path.enter().append('svg:path')
       .attr('class', 'link')
       .classed('selected', function(d) { return d === selected_link; })
-      .style('marker-end', d3graph.directed ? 'url(#end-arrow)' : '')
+      .style('marker-end', graph.isDirected() ? 'url(#end-arrow)' : '')
       .on('mousedown', function(d) {
         if(d3.event.ctrlKey) return;
 
@@ -205,7 +230,7 @@ function newGraphView(parent) {
         var link;
         link = d3graph.links.filter(function(l) {
           return (l.source === source && l.target === target) ||
-            (!d3graph.directed && l.source === target && l.target === source);
+            (!graph.isDirected() && l.source === target && l.target === source);
         })[0];
 
         if(!link) {
@@ -362,9 +387,11 @@ function newGraphView(parent) {
     },
 
     setDirected: function(value) {
-      d3graph.directed = value;
+      graph.setDirected(value);
+      sync();
+      restart();
     }
   }
 }
 
-var graphView = newGraphView('body');
+var graphView = newGraphView('body', graph);
