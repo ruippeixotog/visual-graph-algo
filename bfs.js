@@ -1,7 +1,7 @@
 
 function* bfs(src) {
-  var found = new Array(graph.numNodes);
-  for (var i = 0; i < graph.numNodes; i++)
+  var found = new Array(graph.getNodeCount());
+  for (var i = 0; i < found.length; i++)
     found[i] = false;
 
   var q = [];
@@ -14,7 +14,7 @@ function* bfs(src) {
     yield 0;
     graphView.changeNodeState(curr, "current", "visited");
 
-    graph.adjs[curr].forEach(function(adj) {
+    graph.foreachAdj(curr, function(adj) {
       if(!found[adj]) {
         q.push(adj); found[adj] = true;
       }

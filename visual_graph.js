@@ -17,44 +17,28 @@ function newGraphView(parent, graph) {
 
   var d3graph = {
     nodes: [],
-    links: []
+    links: [],
+    nextId: 0
   }
 
   function sync() {
-    nodesById = {};
-    linksByIds = {};
-
-    for(var i in d3graph.nodes)
-      nodesById[d3graph.nodes[i].id] = d3graph.nodes[i];
-
-    for(var i in d3graph.links) {
-      var src = d3graph.links[i].source.id;
-      var tgt = d3graph.links[i].target.id;
-      linksByIds[[src, tgt]] = d3graph.links[i];
-    }
-
     d3graph.nodes.length = 0;
     d3graph.links.length = 0;
 
-    for(var i = 0; i < graph.numNodes; i++) {
-      if(graph.adjs[i] != null) {
-        nodesById[i] = nodesById[i] || { id: i };
-        d3graph.nodes.push(nodesById[i]);
-      }
-    }
+    graph.foreachNode(function(id, nodeData) {
+      d3graph.nextId = Math.max(d3graph.nextId, Number(id) + 1);
 
-    for(var i = 0; i <= graph.numNodes; i++) {
-      if(graph.adjs[i] == null) continue;
-      for(var j in graph.adjs[i]) {
-        if(!graph.isDirected() && i < graph.adjs[i][j])
-          continue;
+      nodeData.id = id;
+      d3graph.nodes.push(nodeData);
 
-        d3graph.links.push({
-          source: nodesById[i],
-          target: nodesById[graph.adjs[i][j]]
-        });
-      }
-    }
+      graph.foreachAdj(id, function(adj, edgeData) {
+        if(!graph.isDirected() && id < adj) return;
+
+        edgeData.source = nodeData;
+        edgeData.target = graph.getNode(adj);
+        d3graph.links.push(edgeData);
+      });
+    });
   }
 
   sync();
@@ -203,7 +187,7 @@ function newGraphView(parent, graph) {
 
         // reposition drag line
         drag_line
-          .style('marker-end', 'url(#end-arrow)')
+          .style('marker-end', graph.isDirected() ? 'url(#end-arrow)' : '')
           .classed('hidden', false)
           .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
 
@@ -229,16 +213,11 @@ function newGraphView(parent, graph) {
         var source = mousedown_node,
             target = mouseup_node;
 
-        var link;
-        link = d3graph.links.filter(function(l) {
-          return (l.source === source && l.target === target) ||
-            (!graph.isDirected() && l.source === target && l.target === source);
-        })[0];
-
-        if(!link) {
-          link = { source: source, target: target };
+        var link = null;
+        if(!graph.getEdge(source.id, target.id)) {
+          link = graph.addEdge(source.id, target.id,
+            { source: source, target: target });
           d3graph.links.push(link);
-          graph.addEdge(source.id, target.id);
         }
 
         // select new link
@@ -272,11 +251,11 @@ function newGraphView(parent, graph) {
 
     // insert new node at point
     var point = d3.mouse(this),
-        node = { id: graph.addNode() };
-    node.x = point[0];
-    node.y = point[1];
+        node = graph.addNode(d3graph.nextId,
+          { id: d3graph.nextId, x: point[0], y: point[1] });
     d3graph.nodes.push(node);
 
+    d3graph.nextId++;
     restart();
   }
 
