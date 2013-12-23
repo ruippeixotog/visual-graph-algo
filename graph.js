@@ -60,38 +60,52 @@ function newGraph(graphDef) {
 
     isDirected: function() {
       return this.directed;
+    },
+
+    setDirected: function(dir) {
+      if(this.directed == dir) return;
+      if(dir) this.convertToDirected();
+      else this.convertToUndirected();
+    },
+
+    convertToDirected: function() {
+      this.directed = true;
+      var that = this;
+      this.foreachNode(function(id) {
+        that.foreachAdj(id, function(adj, edgeData) {
+          if(id < adj)
+            that.addEdge(id, adj, $.extend({}, edgeData));
+        });
+      });
+    },
+
+    convertToUndirected: function(mergeFunc) {
+      mergeFunc = mergeFunc || function() {};
+
+      var visited = {};
+      this.foreachNode(function(id) {
+        if(visited[id]) return;
+
+        var q = [{ id: id, parent: null, edge: null }];
+        while(q.length > 0) {
+          var curr = q.shift();
+
+          if(curr.parent != null) {
+            var backEdge = this.getEdge(curr.id, curr.parent);
+            if(!backEdge) this.addEdge(curr.id, curr.parent, curr.edge);
+            else mergeFunc(curr.edge, backEdge);
+          }
+
+          if(visited[curr.id]) continue;
+          visited[curr.id] = true;
+
+          this.foreachAdj(curr.id, function(adj, edgeData) {
+            q.push({ id: adj, parent: curr.id, edge: edgeData });
+          });
+        }
+      }.bind(this));
+      this.directed = false;
     }
-
-    // setDirected: function(value) {
-    //   if(this.directed == value) return;
-    //   if(!value) {
-    //     var found = new Array(this.numNodes);
-    //     for (var i = 0; i < this.numNodes; i++)
-    //       found[i] = false;
-
-    //     for (var i = 0; i < this.numNodes; i++) {
-    //       if(this.adjs[i] == null || found[i]) continue;
-    //       var q = [{ id: i, parent: null }];
-
-    //       while(q.length > 0) {
-    //         var curr = q.shift();
-    //         if(found[curr.id]) continue;
-    //         found[curr.id] = true;
-
-    //         var foundParent = false;
-    //         this.adjs[curr.id].forEach(function(adj) {
-    //           q.push({ id: adj, parent: curr.id });
-    //           if(adj == curr.parent) foundParent = true;
-    //         });
-    //         if(curr.parent != null && !foundParent)
-    //           this.addEdge(curr.id, curr.parent);
-    //       }
-    //     }
-    //   } else {
-    //     this.numEdges *= 2;
-    //   }
-    //   this.directed = value;
-    // }
   };
 
   if(graphDef) {
