@@ -1,12 +1,4 @@
 
-var ctl = {
-  step: function() { return { step: true }; },
-
-  view: function(func) {
-    return { step: false, view: func };
-  }
-};
-
 function* bfs(graph, src) {
   var found = new Array(graph.getNodeCount());
   for (var i = 0; i < found.length; i++)

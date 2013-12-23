@@ -3,11 +3,34 @@ $(function() {
   var graph = newGraph(graphDefs["default"]);
   var graphView = newGraphView('body', graph);
 
+  $("#examples").change(function(value) {
+    graph = newGraph(graphDefs[$("#examples").val()]);
+    graphView.setGraph(graph);
+  });
+
+  $.each(graphDefs, function(name, def) {
+    $("#examples").append('<option value="' + name + '">' + name + '</option>');
+  });
+
+  $("#directed").change(function() {
+    graphView.setDirected($(this).is(":checked"));
+  });
+
   var algo, finished;
 
-  $("#start").click(function() {
-    var startAt = Number($("#startAt").val());
+  $("#bfsStart").click(function() {
+    var startAt = Number($("#bfsStartAt").val());
     algo = bfs(graph, startAt);
+
+    finished = false;
+    graphView.resetNodes();
+
+    $("#next").click();
+  });
+
+  $("#dfsStart").click(function() {
+    var startAt = Number($("#dfsStartAt").val());
+    algo = dfs(graph, startAt);
 
     finished = false;
     graphView.resetNodes();
@@ -29,18 +52,5 @@ $(function() {
     }
 
     if(finished) alert("Finished!");
-  });
-
-  $("#directed").change(function() {
-    graphView.setDirected($(this).is(":checked"));
-  });
-
-  $.each(graphDefs, function(name, def) {
-    $("#examples").append('<option value="' + name + '">' + name + '</option>');
-  });
-
-  $("#examples").change(function(value) {
-    graph = newGraph(graphDefs[$("#examples").val()]);
-    graphView.setGraph(graph);
   });
 });

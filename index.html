@@ -2,12 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Interactive BFS</title>
+    <title>Interactive graph algorithms</title>
     <link rel="stylesheet" href="visual_graph.css">
   </head>
   
   <body>
-    <h1>Interactive BFS</h1>
+    <h1>Interactive graph algorithms</h1>
 
     <p>
       Click in the open space to <b>add a node</b>, drag from one node to another to <b>add an edge</b>. 
@@ -19,9 +19,16 @@
       <label>Choose an example graph: </label><select id="examples"></select>&nbsp;&nbsp;
       <input id="directed" type="checkbox">Directed graph</input>
     </p>
-    <label>Start BFS at:</label><input id="startAt" type="text" />
-    <input id="start" type="button" value="Start" />
-    <input id="next" type="button" value="Next" />
+    <label>BFS |</label>
+    <label>Start at:</label><input id="bfsStartAt" type="text" />
+    <input id="bfsStart" type="button" value="Start" />&nbsp;&nbsp;&nbsp;&nbsp;
+
+    <label>DFS |</label>
+    <label>Start at:</label><input id="dfsStartAt" type="text" />
+    <input id="dfsStart" type="button" value="Start" />&nbsp;&nbsp;&nbsp;&nbsp;
+
+    <input id="next" type="button" value="Next step" />
+
   </body>
 
   <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -30,6 +37,8 @@
   <script src="graphdef.js"></script>
   <script src="graph.js"></script>
   <script src="visual_graph.js"></script>
+  <script src="algoctl.js"></script>
   <script src="bfs.js"></script>
+  <script src="dfs.js"></script>
   <script src="app.js"></script>
 </html>
