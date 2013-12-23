@@ -1,5 +1,13 @@
 
-function* bfs(src) {
+var ctl = {
+  step: function() { return { step: true }; },
+
+  view: function(func) {
+    return { step: false, view: func };
+  }
+};
+
+function* bfs(graph, src) {
   var found = new Array(graph.getNodeCount());
   for (var i = 0; i < found.length; i++)
     found[i] = false;
@@ -10,9 +18,9 @@ function* bfs(src) {
   while(q.length > 0) {
     var curr = q.shift();
 
-    graphView.changeNodeState(curr, "", "current");
-    yield 0;
-    graphView.changeNodeState(curr, "current", "visited");
+    yield ctl.view(function(v) { v.changeNodeState(curr, "", "current"); });
+    yield ctl.step();
+    yield ctl.view(function(v) { v.changeNodeState(curr, "current", "visited"); });
 
     graph.foreachAdj(curr, function(adj) {
       if(!found[adj]) {

@@ -371,8 +371,12 @@ function newGraphView(parent, graph) {
       graph.setDirected(value);
       sync();
       restart();
+    },
+
+    setGraph: function(newGraph) {
+      graph = newGraph;
+      sync();
+      restart();
     }
   }
 }
-
-var graphView = newGraphView('body', graph);

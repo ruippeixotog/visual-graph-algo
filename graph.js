@@ -113,12 +113,10 @@ function newGraph(graphDef) {
       graph.addNode(i);
 
     for(var i = 1; i <= graphDef[0][1]; i++) {
-      var src = graphDef[i][0] - 1;
-      var dest = graphDef[i][1] - 1;
-      graph.addEdge(src, dest);
+      var src = graphDef[i][0];
+      var dest = graphDef[i][1];
+      graph.addEdge(src, dest, { value: graphDef[i][2] || 1 });
     }
   }
   return graph;
 }
-
-var graph = newGraph(graphDef);
