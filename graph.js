@@ -1,5 +1,6 @@
 
 function newGraph(graphDef) {
+  // TODO redesign the graph model from scratch
   var graph = {
     numNodes: 0,
     numEdges: 0,
@@ -12,10 +13,12 @@ function newGraph(graphDef) {
     },
 
     removeNode: function(id) {
-      if(this.directed) {
-        this.adjs[id].forEach(function(adj) {
+      // very inefficient!
+      for(var i in this.adjs) {
+        if(this.adjs[i] == null) continue;
+        this.adjs[i].forEach(function(adj) {
           this.adjs[adj].splice(this.adjs[adj].indexOf(id), 1);
-        });
+        }.bind(this));
       }
       this.adjs[id] = null;
     },

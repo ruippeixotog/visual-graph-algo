@@ -37,19 +37,21 @@ function newGraphView(parent, graph) {
     d3graph.links.length = 0;
 
     for(var i = 0; i < graph.numNodes; i++) {
-      if(graph.adjs[i] != null)
-        d3graph.nodes.push(nodesById[i] || { id: i });
+      if(graph.adjs[i] != null) {
+        nodesById[i] = nodesById[i] || { id: i };
+        d3graph.nodes.push(nodesById[i]);
+      }
     }
 
     for(var i = 0; i <= graph.numNodes; i++) {
+      if(graph.adjs[i] == null) continue;
       for(var j in graph.adjs[i]) {
         if(!graph.isDirected() && i < graph.adjs[i][j])
           continue;
 
-        d3graph.links.push(
-          linksByIds[[i, graph.adjs[i][j]]] || {
-          source: d3graph.nodes[i],
-          target: d3graph.nodes[graph.adjs[i][j]]
+        d3graph.links.push({
+          source: nodesById[i],
+          target: nodesById[graph.adjs[i][j]]
         });
       }
     }
