@@ -3,42 +3,99 @@
   <head>
     <meta charset="utf-8">
     <title>Interactive graph algorithms</title>
-    <link rel="stylesheet" href="visual_graph.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A graph algorithm visualiser.">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+    <!-- Add custom CSS here -->
+    <link href="sb-admin.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="visual_graph.css" />
   </head>
-  
+
   <body>
-    <h1>Interactive graph algorithms</h1>
+    <div id="wrapper">
 
-    <p>
-      Click in the open space to <b>add a node</b>, drag from one node to another to <b>add an edge</b>. 
-      Ctrl-drag a node to <b>move</b> the graph layout. 
-      Click a node or an edge to <b>select it</b>. <b>Delete</b> removes the selected node or edge.
-    </p>
+      <!-- Sidebar -->
+      <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">Interactive graph algorithms</a>
+        </div>
 
-    <p>
-      <label>Choose an example graph: </label><select id="examples"></select>&nbsp;&nbsp;
-      <input id="directed" type="checkbox">Directed graph</input>
-    </p>
-    <label>BFS |</label>
-    <label>Start at:</label><input id="bfsStartAt" type="text" />
-    <input id="bfsStart" type="button" value="Start" />&nbsp;&nbsp;&nbsp;&nbsp;
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav side-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-caret-square-o-down"></i> Graph Traversal <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a id="bfs-opt" href="#">BFS</a></li>
+                <li><a id="dfs-opt" href="#">DFS</a></li>
+              </ul>
+            </li>
+          </ul>
 
-    <label>DFS |</label>
-    <label>Start at:</label><input id="dfsStartAt" type="text" />
-    <input id="dfsStart" type="button" value="Start" />&nbsp;&nbsp;&nbsp;&nbsp;
+          <ul class="nav navbar-nav navbar-right navbar-user">
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </nav>
 
-    <input id="next" type="button" value="Next step" />
+      <div id="page-wrapper">
 
+        <div id="bfs-input" class="algo-input">
+          <label for="bfs-start-at">Start BFS at:</label>
+          <input id="bfs-start-at" type="text" class="form-control" />
+          <input id="bfs-start" type="button" value="Start" class="btn btn-default" />
+          <input type="button" value="Next step" class="algo-next btn btn-default" />
+        </div>
+
+        <div id="dfs-input" class="algo-input" style="display: none">
+          <label for="dfs-start-at">Start DFS at:</label>
+          <input id="dfs-start-at" type="text" class="form-control" />
+          <input id="dfs-start" type="button" value="Start" class="btn btn-default" />
+          <input type="button" value="Next step" class="algo-next btn btn-default" />
+        </div>
+
+        <hr>
+
+        <p>
+          Click in the open space to <b>add a node</b>, drag from one node to another to <b>add an edge</b>. 
+          Ctrl-drag a node to <b>move</b> the graph layout. 
+          Click a node or an edge to <b>select it</b>. <b>Delete</b> removes the selected node or edge.
+        </p>
+
+        <p>
+          <label>Choose an example graph: </label>
+          <select id="examples" class="form-control"></select>&nbsp;&nbsp;&nbsp;&nbsp;
+          <input id="directed" type="checkbox">Directed graph</input>
+        </p>
+
+        <div id="graph-wrapper">
+        </div>
+
+      </div><!-- /#page-wrapper -->
+
+    </div><!-- /#wrapper -->
+
+    <!-- JavaScript -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+
+    <script src="graphdef.js"></script>
+    <script src="graph.js"></script>
+    <script src="visual_graph.js"></script>
+    <script src="algoctl.js"></script>
+    <script src="bfs.js"></script>
+    <script src="dfs.js"></script>
+    <script src="app.js"></script>
   </body>
-
-  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
-  <script src="graphdef.js"></script>
-  <script src="graph.js"></script>
-  <script src="visual_graph.js"></script>
-  <script src="algoctl.js"></script>
-  <script src="bfs.js"></script>
-  <script src="dfs.js"></script>
-  <script src="app.js"></script>
 </html>

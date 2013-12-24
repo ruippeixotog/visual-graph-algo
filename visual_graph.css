@@ -1,3 +1,9 @@
+.form-control {
+  display: inline;
+  width: 10em;
+}
+
+/* visual graph */
 svg {
   background-color: #FFF;
   cursor: default;

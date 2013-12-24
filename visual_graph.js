@@ -4,7 +4,7 @@ function newGraphView(parent, graph) {
   var width  = 800,
       height = 600;
 
-  var svg = d3.select('body')
+  var svg = d3.select(parent)
     .append('svg')
     .attr('width', '100%')
     .attr('height', '75%')
