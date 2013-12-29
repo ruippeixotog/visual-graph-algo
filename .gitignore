@@ -1,0 +1,5 @@
+node_modules/
+build/
+dependencies/compiled/
+
+.DS_Store

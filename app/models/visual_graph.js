@@ -1,5 +1,5 @@
-
-function newGraphView(parent, graph) {
+ 
+newGraphView = function(parent, graph) {
   // set up SVG for D3
   var width  = 800,
       height = 600;

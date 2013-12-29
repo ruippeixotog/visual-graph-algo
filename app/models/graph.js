@@ -1,5 +1,5 @@
 
-function newGraph(graphDef) {
+newGraph = function(graphDef) {
   var graph = {
     nodeData: {},
     nodeCount: 0,

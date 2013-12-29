@@ -1,4 +1,4 @@
-var graphDefs = {
+graphDefs = {
   "default": [
     [7, 7],
     [0, 3, 2],
