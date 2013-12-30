@@ -5,12 +5,12 @@ VisualAlgo = Ember.Application.create({
   LOG_TRANSITIONS: true
 });
 
-require('app/models/graphdef');
-require('app/models/graph');
-require('app/models/visual_graph');
-require('app/models/algoctl');
-require('app/models/bfs');
-require('app/models/dfs');
-require('app/models/app');
+require('app/old/graphdef');
+require('app/old/graph');
+require('app/old/visual_graph');
+require('app/old/algoctl');
+require('app/old/bfs');
+require('app/old/dfs');
+require('app/old/app');
 
 require('app/routes/router');
