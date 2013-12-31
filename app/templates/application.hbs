@@ -17,10 +17,15 @@
     <div class="collapse navbar-collapse navbar-ex1-collapse">
       <ul class="nav navbar-nav side-nav">
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-caret-square-o-down"></i> Graph Traversal <b class="caret"></b></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-caret-square-o-down"></i> Algorithms <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a id="bfs-opt" href="#">BFS</a></li>
-            <li><a id="dfs-opt" href="#">DFS</a></li>
+            {{#each algorithms}}
+              <li>
+                {{#link-to "algorithm" this currentWhen="algorithm"}}
+                  {{name}}
+                {{/link-to}}
+              </li>
+            {{/each}}
           </ul>
         </li>
       </ul>
@@ -31,20 +36,7 @@
   </nav>
 
   <div id="page-wrapper">
-
-    <div id="bfs-input" class="algo-input">
-      <label for="bfs-start-at">Start BFS at:</label>
-      <input id="bfs-start-at" type="text" class="form-control" />
-      <input id="bfs-start" type="button" value="Start" class="btn btn-default" />
-      <input type="button" value="Next step" class="algo-next btn btn-default" />
-    </div>
-
-    <div id="dfs-input" class="algo-input" style="display: none">
-      <label for="dfs-start-at">Start DFS at:</label>
-      <input id="dfs-start-at" type="text" class="form-control" />
-      <input id="dfs-start" type="button" value="Start" class="btn btn-default" />
-      <input type="button" value="Next step" class="algo-next btn btn-default" />
-    </div>
+    {{outlet}}
 
     <hr>
 
@@ -60,9 +52,7 @@
       <input id="directed" type="checkbox">Directed graph</input>
     </p>
 
-    <div id="graph-wrapper">
-    </div>
-
+    <div id="graph-wrapper"></div>
   </div><!-- /#page-wrapper -->
 
 </div><!-- /#wrapper -->

@@ -1,5 +1,5 @@
 
-var ctl = {
+ctl = {
   step: function() { return { step: true }; },
 
   view: function(func) {
