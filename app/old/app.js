@@ -1,11 +1,7 @@
 
 $(function() {
-  graph = newGraph(graphDefs["default"]);
-  graphView = newGraphView('#graph-wrapper', graph);
-
   $("#examples").change(function(value) {
-    graph = newGraph(graphDefs[$("#examples").val()]);
-    graphView.setGraph(graph);
+    VisualAlgo.Global.set('graph', newGraph(graphDefs[$("#examples").val()]));
   });
 
   $.each(graphDefs, function(name, def) {

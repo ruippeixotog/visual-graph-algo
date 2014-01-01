@@ -1,17 +1,17 @@
 VisualAlgo.DFS = VisualAlgo.TraversalAlgorithm.create({
   name: "DFS",
 
-  startAlgo: function(graph) {
-    return this.dfs(graph, this.get("startAt"));
+  startAlgo: function() {
+    return this.dfs(this.get('graph'), this.get("startAt"));
   },
 
   dfs: function* (graph, curr, visited) {
     visited = visited || {};
     if(visited[curr]) return;
 
-    yield ctl.view(function(v) { v.changeNodeState(curr, "", "current"); });
+    graph.getNode(curr).view.classes = ["current"];
     yield ctl.step();
-    yield ctl.view(function(v) { v.changeNodeState(curr, "current", "visited"); });
+    graph.getNode(curr).view.classes = ["visited"];
 
     visited[curr] = true;
 

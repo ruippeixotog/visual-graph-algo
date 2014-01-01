@@ -1,8 +1,8 @@
 VisualAlgo.BFS = VisualAlgo.TraversalAlgorithm.create({
   name: "BFS",
 
-  startAlgo: function(graph) {
-    return this.bfs(graph, this.get("startAt"));
+  startAlgo: function() {
+    return this.bfs(this.get('graph'), this.get("startAt"));
   },
 
   bfs: function* (graph, src) {
@@ -16,9 +16,9 @@ VisualAlgo.BFS = VisualAlgo.TraversalAlgorithm.create({
     while(q.length > 0) {
       var curr = q.shift();
 
-      yield ctl.view(function(v) { v.changeNodeState(curr, "", "current"); });
+      graph.getNode(curr).view.classes = ["current"];
       yield ctl.step();
-      yield ctl.view(function(v) { v.changeNodeState(curr, "current", "visited"); });
+      graph.getNode(curr).view.classes = ["visited"];
 
       graph.foreachAdj(curr, function(adj) {
         if(!found[adj]) {
