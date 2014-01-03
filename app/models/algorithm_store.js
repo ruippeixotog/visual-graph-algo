@@ -1,3 +1,3 @@
 VisualAlgo.AlgorithmStore = Ember.Object.create({
-  algorithms: Ember.A([]),
+  algorithms: Ember.A([])
 });

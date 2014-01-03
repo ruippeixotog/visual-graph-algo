@@ -123,7 +123,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
       // add new links
       path.enter().append('svg:path')
-        .attr('class', function(d) { return $.merge(['link'], d.view.classes || []).join(' '); })
+        .attr('class', function(d) { d.view = {}; return $.merge(['link'], d.view.classes || []).join(' '); })
         .classed('selected', function(d) { return d === selected_link; })
         .style('marker-end', that.get('graph').isDirected() ? 'url(#end-arrow)' : '')
         .on('mousedown', function(d) {
@@ -154,7 +154,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       var g = circle.enter().append('svg:g');
 
       g.append('svg:circle')
-        .attr('class', function(d) { return $.merge(['node'], d.view.classes || []).join(' '); })
+        .attr('class', function(d) { d.view = {}; return $.merge(['node'], d.view.classes || []).join(' '); })
         .attr('r', 12)
         .classed('selected', function(d) { return d === selected_node; })
         .attr('data-nodeid', function(d) { return d.id; })
@@ -235,7 +235,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     function mousedown() {
       // prevent I-bar on drag
       //d3.event.preventDefault();
-      
+
       // because :active only works in WebKit?
       svg.classed('active', true);
 
@@ -351,7 +351,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   syncWithModel: function() {
     var graph = this.get('graph');
     var d3graph = this.get('d3graph');
-    
+
     d3graph.nodes.length = 0;
     d3graph.links.length = 0;
 
