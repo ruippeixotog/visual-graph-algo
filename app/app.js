@@ -5,12 +5,11 @@ VisualAlgo = Ember.Application.create({
   LOG_TRANSITIONS: true
 });
 
-require('app/old/graphdef');
 require('app/old/graph');
 require('app/old/algoctl');
 require('app/old/app');
 
-require('app/models/global');
+require('app/models/graph_store');
 require('app/models/algorithm_store');
 require('app/models/algorithm');
 require('app/models/traversal_algorithm');

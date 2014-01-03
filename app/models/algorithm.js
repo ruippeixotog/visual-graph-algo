@@ -8,7 +8,7 @@ VisualAlgo.Algorithm = Ember.Object.extend({
   reset: function() {},
   shouldRedraw: function() {
     return false;
-  }, 
+  },
   
   init: function() {
     VisualAlgo.AlgorithmStore.get("algorithms").push(this);

@@ -1,11 +1,15 @@
 
 $(function() {
   $("#examples").change(function(value) {
-    VisualAlgo.Global.set('graph', newGraph(graphDefs[$("#examples").val()]));
+    var newGraph = VisualAlgo.GraphStore.get('examples').find(
+        function(e) { return e.name == $("#examples").val(); }).get('graph');
+
+    VisualAlgo.GraphStore.set('current', newGraph);
   });
 
-  $.each(graphDefs, function(name, def) {
-    $("#examples").append('<option value="' + name + '">' + name + '</option>');
+  $.each(VisualAlgo.GraphStore.get('examples'), function(i, obj) {
+    $("#examples").append('<option value="' + obj.get('name') + '">' +
+      obj.get('name') + '</option>');
   });
 
   $("#directed").change(function() {

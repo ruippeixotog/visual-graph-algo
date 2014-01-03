@@ -4,9 +4,7 @@ VisualAlgo.TraversalAlgorithm = VisualAlgo.Algorithm.extend({
     templateName: 'traversal_input'
   }),
 
-  graph: function() {
-    return VisualAlgo.Global.get('graph');
-  }.property('VisualAlgo.Global.graph'),
+  graphBinding: 'VisualAlgo.GraphStore.current',
 
   startAt: function() {
     return null;
