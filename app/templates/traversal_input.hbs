@@ -6,7 +6,12 @@
 
 <p>
   <label>Choose an example graph: </label>
-  <select id="examples" class="form-control"></select>&nbsp;&nbsp;&nbsp;&nbsp;
+  {{view Ember.Select
+         content=VisualAlgo.GraphStore.examples
+         optionLabelPath="content.name"
+         selection=VisualAlgo.GraphStore.currentExample
+         class="form-control"}}
+  
   <!--<input id="directed" type="checkbox">Directed graph</input> not supported for now -->
 </p>
 

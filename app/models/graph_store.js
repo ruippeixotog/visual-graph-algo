@@ -1,6 +1,15 @@
-VisualAlgo.GraphStore = Ember.Object.create({
+VisualAlgo.GraphStore = Ember.Object.extend({
 
   current: null,
+
+  currentExample: function(key, value) {
+    if(arguments.length > 1) {
+      this.set('current', Ember.isNone(value) ? null : value.get('graph'));
+      return value;
+    } else {
+      return Ember.Object.create({ graph: this.get('current') });
+    }
+  }.property('current'),
 
   examples: Ember.A([
     Ember.Object.create({ name: "default", graph: newGraph([
@@ -39,6 +48,6 @@ VisualAlgo.GraphStore = Ember.Object.create({
   ]),
 
   init: function() {
-    this.set('current', this.get('examples')[0].get('graph'));
+    this.set('currentExample', this.get('examples')[0]);
   }
-});
+}).create();
