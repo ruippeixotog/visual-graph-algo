@@ -47,7 +47,7 @@ module.exports = function(grunt) {
         files: ['app/templates/**/*.hbs'],
         tasks: ['emberTemplates', 'neuter']
       }
-    },
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-cssmin');
