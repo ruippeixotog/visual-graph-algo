@@ -6,7 +6,6 @@ VisualAlgo = Ember.Application.create({
 });
 
 require('app/old/algoctl');
-require('app/old/app');
 
 require('app/models/graph');
 require('app/models/graph_store');

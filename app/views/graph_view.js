@@ -123,7 +123,10 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
       // add new links
       path.enter().append('svg:path')
-        .attr('class', function(d) { d.view = {}; return $.merge(['link'], d.view.classes || []).join(' '); })
+        .attr('class', function(d) {
+          d.view = d.view || {};
+          return $.merge(['link'], d.view.classes || []).join(' ');
+        })
         .classed('selected', function(d) { return d === selected_link; })
         .style('marker-end', that.get('graph').isDirected() ? 'url(#end-arrow)' : '')
         .on('mousedown', function(d) {
@@ -375,23 +378,23 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   },
 
   redraw: function() {
-    if(this.get('shouldRedraw')) {
-      this.syncWithModel();
-      this.restart();
-    }
-    this.set('shouldRedraw', false);
-  }.observes('shouldRedraw'),
+    this.syncWithModel();
+    this.restart();
 
-  innerView: Ember.View.extend({
-    classNames: ['inner_graph_view'],
-    elementId: 'graph-wrapper'
-  }),
+    if(this.get('shouldRedraw'))
+      this.set('shouldRedraw', false);
+  }.observes('shouldRedraw', 'graph.directed'),
 
   onGraphChange: function() {
     this.get('svg').remove();
     this.set('svg', null);
     this.createView();
   }.observes('graph'),
+
+  innerView: Ember.View.extend({
+    classNames: ['inner_graph_view'],
+    elementId: 'graph-wrapper'
+  }),
 
   didInsertElement: function() {
     this.createView();

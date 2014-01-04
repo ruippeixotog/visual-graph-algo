@@ -15,7 +15,7 @@ VisualAlgo.DFS = VisualAlgo.TraversalAlgorithm.create({
 
     visited[curr] = true;
 
-    for(adj in graph.adjList[curr]) {
+    for(adj in graph._adjList[curr]) { // TODO: dfs cannot depend directly on _adjList
       yield* this.dfs(graph, adj, visited);
     }
   }

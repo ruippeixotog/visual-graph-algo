@@ -1,15 +1,15 @@
 VisualAlgo.Graph = Ember.Object.extend({
 
-  nodeData: {},
-  adjList: {},
-  directed: false,
+  _nodeData: {},
+  _adjList: {},
+  _directed: false,
 
   nodeCount: 0,
 
   addNode: function(id, data) {
     data = data || {};
-    this.nodeData[id] = data;
-    this.adjList[id] = {};
+    this._nodeData[id] = data;
+    this._adjList[id] = {};
 
     this.nodeCount++;
     return data;
@@ -17,17 +17,17 @@ VisualAlgo.Graph = Ember.Object.extend({
 
   removeNode: function(id) {
     // inefficient!
-    $.each(this.adjList, function(id2, adjs) {
+    $.each(this._adjList, function(id2, adjs) {
       delete adjs[id];
     });
 
-    delete this.adjList[id];
-    delete this.nodeData[id];
+    delete this._adjList[id];
+    delete this._nodeData[id];
     this.nodeCount--;
   },
 
   getNode: function(id) {
-    return this.nodeData[id];
+    return this._nodeData[id];
   },
 
   getNodeCount: function() {
@@ -35,41 +35,41 @@ VisualAlgo.Graph = Ember.Object.extend({
   },
 
   foreachNode: function(func) {
-    $.each(this.nodeData, func);
+    $.each(this._nodeData, func);
   },
 
   addEdge: function(src, dest, data) {
     data = data || {};
-    this.adjList[src][dest] = data;
-    if(!this.directed) this.adjList[dest][src] = data;
+    this._adjList[src][dest] = data;
+    if(!this.isDirected()) this._adjList[dest][src] = data;
     return data;
   },
 
   removeEdge: function(src, dest) {
-    delete this.adjList[src][dest];
-    if(!this.directed) delete this.adjList[dest][src];
+    delete this._adjList[src][dest];
+    if(!this.isDirected()) delete this._adjList[dest][src];
   },
 
   getEdge: function(src, dest) {
-    return this.adjList[src][dest];
+    return this._adjList[src][dest];
   },
 
   foreachAdj: function(id, func) {
-    $.each(this.adjList[id], func);
+    $.each(this._adjList[id], func);
   },
 
   isDirected: function() {
-    return this.directed;
+    return this.get('_directed');
   },
 
   setDirected: function(dir) {
-    if(this.directed == dir) return;
+    if(this.isDirected() == dir) return;
     if(dir) this.convertToDirected();
     else this.convertToUndirected();
   },
 
   convertToDirected: function() {
-    this.directed = true;
+    this.set('_directed', true);
     var that = this;
     this.foreachNode(function(id) {
       that.foreachAdj(id, function(adj, edgeData) {
@@ -80,7 +80,7 @@ VisualAlgo.Graph = Ember.Object.extend({
   },
 
   convertToUndirected: function(mergeFunc) {
-    mergeFunc = mergeFunc || function() {};
+    mergeFunc = mergeFunc || function(a, b) { return a; };
 
     var visited = {};
     this.foreachNode(function(id) {
@@ -93,7 +93,11 @@ VisualAlgo.Graph = Ember.Object.extend({
         if(curr.parent != null) {
           var backEdge = this.getEdge(curr.id, curr.parent);
           if(!backEdge) this.addEdge(curr.id, curr.parent, curr.edge);
-          else mergeFunc(curr.edge, backEdge);
+          else {
+            var mergedEdge = mergeFunc(curr.edge, backEdge);
+            this.addEdge(curr.id, curr.parent, mergedEdge);
+            this.addEdge(curr.parent, curr.id, mergedEdge);
+          }
         }
 
         if(visited[curr.id]) continue;
@@ -104,13 +108,13 @@ VisualAlgo.Graph = Ember.Object.extend({
         });
       }
     }.bind(this));
-    this.directed = false;
+    this.set('_directed', false);
   },
 
   graphDef: function(key, value) {
     if(arguments.length > 1) {
-      this.nodeData = {};
-      this.adjList = {};
+      this._nodeData = {};
+      this._adjList = {};
 
       for(var i = 0; i < value[0][0]; i++)
         this.addNode(i);
@@ -142,5 +146,14 @@ VisualAlgo.Graph = Ember.Object.extend({
       def[0] = [this.getNodeCount(), def.length - 1];
       return def;
     }
-  }.property() // TODO: not updated when the graph updates
+  }.property(), // TODO: not updated when the graph updates
+
+  directed: function(key, value) {
+    if(arguments.length > 1) {
+      this.setDirected(value);
+      return value;
+    } else {
+      return this.isDirected();
+    }
+  }.property('_directed')
 });
