@@ -50,6 +50,15 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   },
 
   // -------
+  // D3 state
+
+  selectedNode: null,
+  selectedLink: null,
+  mousedownLink: null,
+  mousedownNode: null,
+  mouseupNode: null,
+
+  // -------
   // D3 view components
 
   svgWidth: 800,
@@ -133,17 +142,10 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     var path = this.get('path'),
         circle = this.get('circle');
 
-    // mouse event vars
-    var selected_node = null,
-        selected_link = null,
-        mousedown_link = null,
-        mousedown_node = null,
-        mouseup_node = null;
-
     function resetMouseVars() {
-      mousedown_node = null;
-      mouseup_node = null;
-      mousedown_link = null;
+      view.set('mousedownNode', null);
+      view.set('mouseupNode', null);
+      view.set('mousedownLink', null);
     }
 
     // update force layout (called automatically each iteration)
@@ -177,7 +179,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       // update existing links
       path
         .attr('class', function(d) { return $.merge(['link'], d.view.classes || []).join(' '); })
-        .classed('selected', function(d) { return d === selected_link; })
+        .classed('selected', function(d) { return d === view.get('selectedLink'); })
         .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '');
 
 
@@ -187,16 +189,16 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           d.view = d.view || {};
           return $.merge(['link'], d.view.classes || []).join(' ');
         })
-        .classed('selected', function(d) { return d === selected_link; })
+        .classed('selected', function(d) { return d === view.get('selectedLink'); })
         .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '')
         .on('mousedown', function(d) {
           if(d3.event.ctrlKey) return;
 
           // select link
-          mousedown_link = d;
-          if(mousedown_link === selected_link) selected_link = null;
-          else selected_link = mousedown_link;
-          selected_node = null;
+          view.set('mousedownLink', d);
+          if(view.get('mousedownLink') === view.get('selectedLink')) this.set('selectedLink', null);
+          else view.set('selectedLink', view.get('mousedownLink'));
+          view.set('selectedNode', null);
           restart();
         });
 
@@ -211,7 +213,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       // update existing nodes (selected visual states)
       circle.selectAll('circle')
         .attr('class', function(d) { return $.merge(['node'], d.view.classes || []).join(' '); })
-        .classed('selected', function(d) { return d === selected_node; });
+        .classed('selected', function(d) { return d === view.get('selectedNode'); });
 
       // add new nodes
       var g = circle.enter().append('svg:g');
@@ -219,15 +221,15 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       g.append('svg:circle')
         .attr('class', function(d) { d.view = {}; return $.merge(['node'], d.view.classes || []).join(' '); })
         .attr('r', 12)
-        .classed('selected', function(d) { return d === selected_node; })
+        .classed('selected', function(d) { return d === view.get('selectedNode'); })
         .attr('data-nodeid', function(d) { return d.id; })
         .on('mouseover', function(d) {
-          if(!mousedown_node || d === mousedown_node) return;
+          if(!view.get('mousedownNode') || d === view.get('mousedownNode')) return;
           // enlarge target node
           d3.select(this).attr('transform', 'scale(1.1)');
         })
         .on('mouseout', function(d) {
-          if(!mousedown_node || d === mousedown_node) return;
+          if(!view.get('mousedownNode') || d === view.get('mousedownNode')) return;
           // unenlarge target node
           d3.select(this).attr('transform', '');
         })
@@ -235,21 +237,22 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           if(d3.event.ctrlKey) return;
 
           // select node
-          mousedown_node = d;
-          if(mousedown_node === selected_node) selected_node = null;
-          else selected_node = mousedown_node;
-          selected_link = null;
+          view.set('mousedownNode', d);
+          if(view.get('mousedownNode') === view.get('selectedNode')) view.set('selectedNode', null);
+          else view.set('selectedNode', view.get('mousedownNode'));
+          view.set('selectedLink', null);
 
           // reposition drag line
           drag_line
             .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '')
             .classed('hidden', false)
-            .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
+            .attr('d', 'M' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y +
+              'L' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y);
 
           restart();
         })
         .on('mouseup', function(d) {
-          if(!mousedown_node) return;
+          if(!view.get('mousedownNode')) return;
 
           // needed by FF
           drag_line
@@ -257,16 +260,16 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
             .style('marker-end', '');
 
           // check for drag-to-self
-          mouseup_node = d;
-          if(mouseup_node === mousedown_node) { resetMouseVars(); return; }
+          view.set('mouseupNode', d);
+          if(view.get('mouseupNode') === view.get('mousedownNode')) { resetMouseVars(); return; }
 
           // unenlarge target node
           d3.select(this).attr('transform', '');
 
           // add link to graph (update if exists)
           // NB: links are strictly source < target; arrows separately specified by booleans
-          var source = mousedown_node,
-              target = mouseup_node;
+          var source = view.get('mousedownNode'),
+              target = view.get('mouseupNode');
 
           var link = null;
           if(!view.get('graph').getEdge(source.id, target.id)) {
@@ -276,8 +279,8 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           }
 
           // select new link
-          selected_link = link;
-          selected_node = null;
+          view.set('selectedLink', link);
+          view.set('selectedNode', null);
           restart();
         });
 
@@ -302,7 +305,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       // because :active only works in WebKit?
       svg.classed('active', true);
 
-      if(d3.event.ctrlKey || mousedown_node || mousedown_link) return;
+      if(d3.event.ctrlKey || view.get('mousedownNode') || view.get('mousedownLink')) return;
 
       // insert new node at point
       var point = d3.mouse(this),
@@ -315,16 +318,17 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     }
 
     function mousemove() {
-      if(!mousedown_node) return;
+      if(!view.get('mousedownNode')) return;
 
       // update drag line
-      drag_line.attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+      drag_line.attr('d', 'M' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y +
+        'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
 
       restart();
     }
 
     function mouseup() {
-      if(mousedown_node) {
+      if(view.get('mousedownNode')) {
         // hide drag line
         drag_line
           .classed('hidden', true)
@@ -362,25 +366,25 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
         svg.classed('ctrl', true);
       }
 
-      if(!selected_node && !selected_link) return;
+      if(!view.get('selectedNode') && !view.get('selectedLink')) return;
       switch(d3.event.keyCode) {
         case 8: // backspace
           d3.event.preventDefault();
 
         case 46: // delete
-          if(selected_node) {
-            view.get('d3nodes').splice(view.get('d3nodes').indexOf(selected_node), 1);
-            spliceLinksForNode(selected_node);
-            view.get('graph').removeNode(selected_node.id);
+          if(view.get('selectedNode')) {
+            view.get('d3nodes').splice(view.get('d3nodes').indexOf(view.get('selectedNode')), 1);
+            spliceLinksForNode(view.get('selectedNode'));
+            view.get('graph').removeNode(view.get('selectedNode').id);
 
-          } else if(selected_link) {
-            view.get('d3links').splice(view.get('d3links').indexOf(selected_link), 1);
+          } else if(view.get('selectedLink')) {
+            view.get('d3links').splice(view.get('d3links').indexOf(view.get('selectedLink')), 1);
             view.get('graph').removeEdge(
-              selected_link.source.id,
-              selected_link.target.id);
+              view.get('selectedLink').source.id,
+              view.get('selectedLink').target.id);
           }
-          selected_link = null;
-          selected_node = null;
+          view.set('selectedLink', null);
+          view.set('selectedNode', null);
           restart();
           break;
       }
