@@ -172,7 +172,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     }
 
     // update graph (called when needed)
-    function restart() {
+    function updateViewLinks() {
       // path (link) group
       path = path.data(view.get('d3links'));
 
@@ -199,12 +199,19 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           if(view.get('mousedownLink') === view.get('selectedLink')) this.set('selectedLink', null);
           else view.set('selectedLink', view.get('mousedownLink'));
           view.set('selectedNode', null);
-          restart();
+          updateViewLinks();
+          updateViewNodes();
         });
 
       // remove old links
       path.exit().remove();
 
+      // set the graph in motion
+      force.start();
+    }
+
+    // update graph (called when needed)
+    function updateViewNodes() {
 
       // circle (node) group
       // NB: the function arg is crucial here! nodes are known by id, not by index!
@@ -249,7 +256,8 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
             .attr('d', 'M' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y +
               'L' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y);
 
-          restart();
+          updateViewLinks();
+          updateViewNodes();
         })
         .on('mouseup', function(d) {
           if(!view.get('mousedownNode')) return;
@@ -269,7 +277,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           // add link to graph (update if exists)
           // NB: links are strictly source < target; arrows separately specified by booleans
           var source = view.get('mousedownNode'),
-              target = view.get('mouseupNode');
+            target = view.get('mouseupNode');
 
           var link = null;
           if(!view.get('graph').getEdge(source.id, target.id)) {
@@ -281,15 +289,16 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           // select new link
           view.set('selectedLink', link);
           view.set('selectedNode', null);
-          restart();
+          updateViewLinks();
+          updateViewNodes();
         });
 
       // show node IDs
       g.append('svg:text')
-          .attr('x', 0)
-          .attr('y', 4)
-          .attr('class', 'id')
-          .text(function(d) { return d.id; });
+        .attr('x', 0)
+        .attr('y', 4)
+        .attr('class', 'id')
+        .text(function(d) { return d.id; });
 
       // remove old nodes
       circle.exit().remove();
@@ -314,7 +323,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       view.get('d3nodes').push(node);
 
       view.set('nextNodeId', view.get('nextNodeId') + 1);
-      restart();
+      updateViewNodes();
     }
 
     function mousemove() {
@@ -324,7 +333,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       drag_line.attr('d', 'M' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y +
         'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
 
-      restart();
+      updateViewLinks();
     }
 
     function mouseup() {
@@ -377,15 +386,19 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
             spliceLinksForNode(view.get('selectedNode'));
             view.get('graph').removeNode(view.get('selectedNode').id);
 
+            view.set('selectedNode', null);
+            updateViewLinks();
+            updateViewNodes();
+
           } else if(view.get('selectedLink')) {
             view.get('d3links').splice(view.get('d3links').indexOf(view.get('selectedLink')), 1);
             view.get('graph').removeEdge(
               view.get('selectedLink').source.id,
               view.get('selectedLink').target.id);
+
+            view.set('selectedLink', null);
+            updateViewLinks();
           }
-          view.set('selectedLink', null);
-          view.set('selectedNode', null);
-          restart();
           break;
       }
     }
@@ -409,15 +422,18 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     d3.select(window)
       .on('keydown', keydown)
       .on('keyup', keyup);
-    restart();
+    updateViewLinks();
+    updateViewNodes();
 
-    // hyper mega hack to expose the restart function
-    this.restart = restart;
+    // hyper mega hack to expose the restart functions
+    this.updateViewLinks = updateViewLinks;
+    this.updateViewNodes = updateViewNodes;
   },
 
   redraw: function() {
     this.syncWithModel();
-    this.restart();
+    this.updateViewLinks();
+    this.updateViewNodes();
 
     if(this.get('shouldRedraw'))
       this.set('shouldRedraw', false);
