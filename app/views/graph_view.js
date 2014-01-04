@@ -105,6 +105,14 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .charge(-500);
   }.property('d3nodes', 'd3links', 'svgWidth', 'svgHeight'),
 
+  path: function() {
+    return this.get('svg').append('svg:g').selectAll('path');
+  }.property('svg'),
+
+  circle: function() {
+    return this.get('svg').append('svg:g').selectAll('g');
+  }.property('svg'),
+
   createView: function() {
     var view = this;
     var svg = view.get('svg');
@@ -122,8 +130,8 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .attr('d', 'M0,0L0,0');
 
     // handles to link and node element groups
-    var path = svg.append('svg:g').selectAll('path'),
-        circle = svg.append('svg:g').selectAll('g');
+    var path = this.get('path'),
+        circle = this.get('circle');
 
     // mouse event vars
     var selected_node = null,
