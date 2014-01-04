@@ -52,18 +52,17 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   // -------
   // D3 view components
 
+  svgWidth: 800,
+  svgHeight: 600,
+
   svg: function() {
     d3.select("#graph-wrapper svg").remove();
-
-    // set up SVG for D3
-    var width  = 800,
-        height = 600;
 
     var svg = d3.select("#graph-wrapper")
       .append('svg')
       .attr('width', '100%')
-      .attr('height', '70%') // TODO make the graph occupy all available space
-      .attr('viewBox', '0 0 ' + width + ' ' + height)
+      .attr('height', '70%') // TODO: make the graph occupy all available space
+      .attr('viewBox', '0 0 ' + this.get('svgWidth') + ' ' + this.get('svgHeight'))
       .attr('preserveAspectRatio', 'xMidYMid');
 
     // define arrow markers for graph links
@@ -91,32 +90,31 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
     return svg;
 
-  }.property('graph'),
+  }.property('graph', 'svgWidth', 'svgHeight'),
 
   onSvgChange: function() {
     this.createView();
   }.observes('svg'),
 
+  forceLayout: function() {
+    return d3.layout.force()
+      .nodes(this.get('d3nodes'))
+      .links(this.get('d3links'))
+      .size([this.get('svgWidth'), this.get('svgHeight')])
+      .linkDistance(150)
+      .charge(-500);
+  }.property('d3nodes', 'd3links', 'svgWidth', 'svgHeight'),
+
   createView: function() {
     var view = this;
-
-    // set up SVG for D3
-    var width  = 800,
-        height = 600;
-
     var svg = view.get('svg');
 
     // set up initial nodes and links
     this.syncWithModel();
 
     // init D3 force layout
-    var force = d3.layout.force()
-        .nodes(view.get('d3nodes'))
-        .links(view.get('d3links'))
-        .size([width, height])
-        .linkDistance(150)
-        .charge(-500)
-        .on('tick', tick);
+    var force = view.get('forceLayout')
+      .on('tick', tick);
 
     // line displayed when dragging new nodes
     var drag_line = svg.append('svg:path')
