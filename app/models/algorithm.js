@@ -1,4 +1,4 @@
-VisualAlgo.Algorithm = Ember.Object.extend({
+VisualAlgo.Algorithm = Ember.Object.extend(VisualAlgo.AlgorithmEvents, {
   name: "",
   inputView: Ember.View.extend({}),
 

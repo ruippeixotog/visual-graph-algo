@@ -10,7 +10,7 @@ VisualAlgo.DFS = VisualAlgo.TraversalAlgorithm.create({
     if(visited[curr]) return;
 
     graph.getNode(curr).view.classes = ["current"];
-    yield ctl.step();
+    yield this.step;
     graph.getNode(curr).view.classes = ["visited"];
 
     visited[curr] = true;

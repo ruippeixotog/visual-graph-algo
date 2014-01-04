@@ -17,7 +17,7 @@ VisualAlgo.BFS = VisualAlgo.TraversalAlgorithm.create({
       var curr = q.shift();
 
       graph.getNode(curr).view.classes = ["current"];
-      yield ctl.step();
+      yield this.step;
       graph.getNode(curr).view.classes = ["visited"];
 
       graph.foreachAdj(curr, function(adj) {
