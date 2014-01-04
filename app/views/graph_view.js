@@ -3,8 +3,9 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   childViews: ['innerView'],
   graph: null,
 
-  svg: null,
   d3graph: null,
+
+  svg: null,
 
   createView: function() {
     var that = this;
@@ -39,7 +40,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
         .size([width, height])
         .linkDistance(150)
         .charge(-500)
-        .on('tick', tick)
+        .on('tick', tick);
 
     // define arrow markers for graph links
     svg.append('svg:defs').append('svg:marker')
@@ -358,7 +359,6 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     d3graph.nodes.length = 0;
     d3graph.links.length = 0;
 
-    var that = this;
     graph.foreachNode(function(id, nodeData) {
       d3graph.nextId = Math.max(d3graph.nextId, Number(id) + 1);
 
