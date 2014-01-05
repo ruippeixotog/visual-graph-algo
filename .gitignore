@@ -1,0 +1,8 @@
+node_modules/
+build/
+dependencies/compiled/
+dependencies/local/
+
+.DS_Store
+.idea
+*.iml

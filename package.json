@@ -1,0 +1,19 @@
+{
+  "name": "visual-graph-algo",
+  "version": "1.5.0",
+  "description": "'Graph algorithm visualizer'",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "grunt"
+  },
+  "repository": "",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-neuter": "~0.6.0",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-ember-templates": "0.4.14",
+    "grunt-contrib-cssmin": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3"
+  }
+}

@@ -1,0 +1,24 @@
+<p>
+  Click in the open space to <b>add a node</b>, drag from one node to another to <b>add an edge</b>.
+  Ctrl-drag a node to <b>move</b> the graph layout.
+  Click a node or an edge to <b>select it</b>. <b>Delete</b> removes the selected node or edge.
+</p>
+
+<p>
+  <label>Choose an example graph: </label>
+  {{view Ember.Select
+         content=VisualAlgo.GraphStore.examples
+         optionLabelPath="content.name"
+         selection=VisualAlgo.GraphStore.currentExample
+         class="form-control"}}
+
+  {{input type="checkbox" checked=graph.directed}} Directed graph
+
+  <!--<input id="directed" type="checkbox">Directed graph</input> not supported for now -->
+</p>
+
+{{view VisualAlgo.GraphView graphBinding=graph
+                            shouldRedrawBinding=shouldRedraw}}
+
+<label for="bfs-start-at">Start {{name}} at:</label>
+{{input type="text" value=startAt class="form-control"}}
