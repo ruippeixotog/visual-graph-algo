@@ -24,7 +24,8 @@ module.exports = function(grunt) {
     // concatenate JavaScript code in one file
     neuter: {
       options: {
-        includeSourceURL: true
+        includeSourceMap: true,
+        sourceRoot: ".."
       },
       'build/application.js': ['app/app.js']
     },
