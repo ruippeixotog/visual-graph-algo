@@ -7,6 +7,8 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
   graph: null,
 
+  showNodeValues: false,
+
   // -------
   // graph data stored in a D3 handy way
 
@@ -223,13 +225,41 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .attr('class', 'id')
       .text(function(d) { return d.id; });
 
+    if(view.get('showNodeValues')) {
+      // show node value inputs/labels
+      var labels = g.append('svg:g')
+        .attr('transform', 'translate(15,15)')
+        .attr('class', 'node-label')
+        .append('svg:foreignObject')
+        .attr('width', 40)
+        .attr('height', 40);
+
+      labels.append('xhtml:p')
+        .html(function(d) { return d.value || 1; });
+
+      labels.append('xhtml:input')
+        .attr('type', 'text')
+        .attr('class', 'form-control')
+        .attr('value', function(d) { return d.value || 1; })
+        .on('mousedown', function(d) {
+          d3.event.ignore = true;
+        })
+        .on('keydown', function() {
+          d3.event.ignore = true;
+        })
+        .on('change', function(d, i) {
+          d.value = Number(this.value);
+          labels.selectAll('p').html(function(d) { return d.value || 1; });
+        });
+    }
+
     // remove old nodes
     svgNodes.exit().remove();
 
     // set the graph in motion
     this.get('forceLayout').start();
 
-  }.observes('d3nodes.@each'),
+  }.observes('d3nodes.@each', 'showNodeValues'),
 
   // -------
   // D3 link drawing
@@ -303,25 +333,28 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       // draw directed edges with proper padding from node centers
       view.get('svgLinks').attr('d', function(d) {
         var deltaX = d.target.x - d.source.x,
-            deltaY = d.target.y - d.source.y,
-            dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
-            normX = deltaX / dist,
-            normY = deltaY / dist,
-            sourcePadding = 12,
-            targetPadding = view.get('graph').isDirected() ? 17 : 12,
-            sourceX = d.source.x + (sourcePadding * normX),
-            sourceY = d.source.y + (sourcePadding * normY),
-            targetX = d.target.x - (targetPadding * normX),
-            targetY = d.target.y - (targetPadding * normY);
+          deltaY = d.target.y - d.source.y,
+          dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+          normX = deltaX / dist,
+          normY = deltaY / dist,
+          sourcePadding = 12,
+          targetPadding = view.get('graph').isDirected() ? 17 : 12,
+          sourceX = d.source.x + (sourcePadding * normX),
+          sourceY = d.source.y + (sourcePadding * normY),
+          targetX = d.target.x - (targetPadding * normX),
+          targetY = d.target.y - (targetPadding * normY);
         return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
       });
 
       view.get('svgNodes').attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       });
+
+      setTimeout(tick, 1000); // WTF hack to keep the SVG inputs active
     }
 
     function mousedown() {
+      if(d3.event.ignore) return;
       // prevent I-bar on drag
       //d3.event.preventDefault();
 
@@ -332,8 +365,8 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
       // insert new node at point
       var point = d3.mouse(this),
-          node = view.get('graph').addNode(view.get('nextNodeId'),
-            { id: view.get('nextNodeId'), x: point[0], y: point[1] });
+        node = view.get('graph').addNode(view.get('nextNodeId'),
+          { id: view.get('nextNodeId'), x: point[0], y: point[1] });
       view.get('d3nodes').pushObject(node);
 
       view.set('nextNodeId', view.get('nextNodeId') + 1);
@@ -345,7 +378,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       // update drag line
       view.get('dragLine')
         .attr('d', 'M' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y +
-        'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+          'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
     }
 
     function mouseup() {
@@ -376,6 +409,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     var lastKeyDown = -1;
 
     function keydown() {
+      if(d3.event.ignore) return;
       // d3.event.preventDefault();
 
       if(lastKeyDown !== -1) return;
