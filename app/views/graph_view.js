@@ -8,7 +8,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   graph: null,
 
   showNodeValues: false,
-  showEdgeValues: true,
+  showEdgeValues: false,
 
   // -------
   // graph data stored in a D3 handy way
@@ -143,7 +143,10 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       })
       .classed('selected', function(d) { return d === view.get('selectedNode'); });
 
-  }.observes('selectedNode'),
+    svgNodes.selectAll('.node-label')
+      .style('display', view.get('showNodeValues') ? 'block' : 'none');
+
+  }.observes('selectedNode', 'showNodeValues'),
 
   addRemoveNodesInSvg: function() {
     var view = this;
@@ -226,33 +229,31 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .attr('class', 'id')
       .text(function(d) { return d.id; });
 
-    if(view.get('showNodeValues')) {
-      // show node value inputs/labels
-      var labels = g.append('svg:g')
-        .attr('transform', 'translate(10,10)')
-        .attr('class', 'svg-label node-label')
-        .append('svg:foreignObject')
-        .attr('width', 55)
-        .attr('height', 40);
+    // show node value inputs/labels
+    var labels = g.append('svg:g')
+      .attr('class', 'svg-label node-label')
+      .style('display', view.get('showNodeValues') ? 'block' : 'none')
+      .append('svg:foreignObject')
+      .attr('width', 55)
+      .attr('height', 40);
 
-      labels.append('xhtml:p')
-        .html(function(d) { return d.value || 1; });
+    labels.append('xhtml:p')
+      .html(function(d) { return d.value || 1; });
 
-      labels.append('xhtml:input')
-        .attr('type', 'text')
-        .attr('class', 'form-control')
-        .attr('value', function(d) { return d.value || 1; })
-        .on('mousedown', function(d) {
-          d3.event.ignore = true;
-        })
-        .on('keydown', function() {
-          d3.event.ignore = true;
-        })
-        .on('change', function(d, i) {
-          d.value = Number(this.value);
-          labels.selectAll('p').html(function(d) { return d.value || 1; });
-        });
-    }
+    labels.append('xhtml:input')
+      .attr('type', 'text')
+      .attr('class', 'form-control')
+      .attr('value', function(d) { return d.value || 1; })
+      .on('mousedown', function(d) {
+        d3.event.ignore = true;
+      })
+      .on('keydown', function() {
+        d3.event.ignore = true;
+      })
+      .on('change', function(d, i) {
+        d.value = Number(this.value);
+        labels.selectAll('p').html(function(d) { return d.value || 1; });
+      });
 
     // remove old nodes
     svgNodes.exit().remove();
@@ -260,7 +261,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     // set the graph in motion
     this.get('forceLayout').start();
 
-  }.observes('d3nodes.@each', 'showNodeValues'),
+  }.observes('d3nodes.@each'),
 
   // -------
   // D3 link drawing
@@ -292,11 +293,11 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .classed('selected', function(d) { return d === view.get('selectedLink'); })
       .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '');
 
-    if(view.get('showEdgeValues')) {
-      svgLinkLabels
-        .classed('selected', function(d) { return d === view.get('selectedLink'); });
-    }
-  }.observes('selectedLink'),
+    svgLinkLabels
+      .style('display', view.get('showEdgeValues') ? "block" : "none")
+      .classed('selected', function(d) { return d === view.get('selectedLink'); });
+
+  }.observes('selectedLink', 'showEdgeValues'),
 
   addRemoveLinksInSvg: function() {
     var view = this;
@@ -321,49 +322,50 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
         view.set('selectedNode', null);
       });
 
-    if(view.get('showEdgeValues')) {
-      var svgLinkLabels = view.get('svgLinkLabels').data(view.get('d3links'),
-        function(d) { return d.source.id + " " + d.target.id; });
-
-      this.set('svgLinkLabels', svgLinkLabels);
-
-      // show node value inputs/labels
-      var labels = svgLinkLabels.enter().append('svg:foreignObject')
-        .attr('class', 'svg-label edge-label')
-        .attr('width', 55)
-        .attr('height', 40);
-
-      labels.append('xhtml:p')
-        .html(function(d) { return d.value || 1; });
-
-      labels.append('xhtml:input')
-        .attr('type', 'text')
-        .attr('class', 'form-control')
-        .attr('value', function(d) {
-          return d.value || 1;
-        })
-        .on('mousedown', function(d) {
-          d3.event.ignore = true;
-        })
-        .on('keydown', function() {
-          d3.event.ignore = true;
-        })
-        .on('change', function(d, i) {
-          d.value = Number(this.value);
-          labels.selectAll('p').html(function(d) { return d.value || 1; });
-        });
-
-      // remove old link labels
-      svgLinkLabels.exit().remove();
-    }
-
     // remove old links
     svgLinks.exit().remove();
+
+    // add new link labels
+    var svgLinkLabels = view.get('svgLinkLabels').data(view.get('d3links'),
+      function(d) { return d.source.id + " " + d.target.id; });
+
+    this.set('svgLinkLabels', svgLinkLabels);
+
+    // show node value inputs/labels
+    var labels = svgLinkLabels.enter().append('svg:foreignObject')
+      .attr('class', 'svg-label edge-label')
+      .style('display', view.get('showEdgeValues') ? "block" : "none")
+      .classed('selected', function(d) { return d === view.get('selectedLink') })
+      .attr('width', 55)
+      .attr('height', 40);
+
+    labels.append('xhtml:p')
+      .html(function(d) { return d.value || 1; });
+
+    labels.append('xhtml:input')
+      .attr('type', 'text')
+      .attr('class', 'form-control')
+      .attr('value', function(d) {
+        return d.value || 1;
+      })
+      .on('mousedown', function(d) {
+        d3.event.ignore = true;
+      })
+      .on('keydown', function() {
+        d3.event.ignore = true;
+      })
+      .on('change', function(d, i) {
+        d.value = Number(this.value);
+        labels.selectAll('p').html(function(d) { return d.value || 1; });
+      });
+
+    // remove old link labels
+    svgLinkLabels.exit().remove();
 
     // set the graph in motion
     view.get('forceLayout').start();
 
-  }.observes('d3links.@each', 'showEdgeValues'),
+  }.observes('d3links.@each'),
 
   // -------
   // D3 initialization

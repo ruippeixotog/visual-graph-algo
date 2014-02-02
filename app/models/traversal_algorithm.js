@@ -6,6 +6,8 @@ VisualAlgo.TraversalAlgorithm = VisualAlgo.Algorithm.extend({
 
   graphBinding: 'VisualAlgo.GraphStore.current',
 
+  enableDirectedChoice: true,
+
   startAt: function() {
     return null;
   }.property(),

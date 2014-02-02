@@ -43,6 +43,7 @@ path.link.hidden {
 
 .svg-label p {
     padding: 7px 13px 7px 13px;
+    margin-right: 5px;
     pointer-events: none;
     text-align: center;
 }
