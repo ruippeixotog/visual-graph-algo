@@ -41,15 +41,23 @@ path.link.hidden {
     stroke-width: 0;
 }
 
+.svg-label p {
+    padding: 7px 13px 7px 13px;
+    pointer-events: none;
+    text-align: center;
+}
+
+.svg-label input {
+    display: none;
+    width: 50px;
+    text-align: center;
+}
+
 circle.node {
     stroke-width: 1.5px;
     stroke: black;
     cursor: pointer;
     fill: #dddddd;
-}
-
-circle.node ~ .node-label input {
-    display: none;
 }
 
 circle.node.selected {
@@ -72,12 +80,12 @@ circle.node.visited {
     fill: #666666;
 }
 
-.node-label p {
-    padding: 7px 13px 7px 13px;
+.edge-label.selected p {
+    display: none;
 }
 
-.node-label input {
-    width: 50px;
+.edge-label.selected input {
+    display: block;
 }
 
 text {

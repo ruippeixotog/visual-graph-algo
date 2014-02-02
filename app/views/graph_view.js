@@ -8,6 +8,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   graph: null,
 
   showNodeValues: false,
+  showEdgeValues: true,
 
   // -------
   // graph data stored in a D3 handy way
@@ -229,7 +230,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       // show node value inputs/labels
       var labels = g.append('svg:g')
         .attr('transform', 'translate(10,10)')
-        .attr('class', 'node-label')
+        .attr('class', 'svg-label node-label')
         .append('svg:foreignObject')
         .attr('width', 55)
         .attr('height', 40);
@@ -272,9 +273,18 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     return this.get('svgBaseLinks');
   }.property(),
 
+  svgBaseLinkLabels: function() {
+    return this.get('svg').append('svg:g').selectAll('foreignobject');
+  }.property('svg'),
+
+  svgLinkLabels: function() {
+    return this.get('svgBaseLinkLabels');
+  }.property(),
+
   updateLinksInSvg: function() {
     var view = this;
     var svgLinks = view.get('svgLinks');
+    var svgLinkLabels = view.get('svgLinkLabels');
 
     // update existing links
     svgLinks
@@ -282,6 +292,10 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .classed('selected', function(d) { return d === view.get('selectedLink'); })
       .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '');
 
+    if(view.get('showEdgeValues')) {
+      svgLinkLabels
+        .classed('selected', function(d) { return d === view.get('selectedLink'); });
+    }
   }.observes('selectedLink'),
 
   addRemoveLinksInSvg: function() {
@@ -307,13 +321,49 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
         view.set('selectedNode', null);
       });
 
+    if(view.get('showEdgeValues')) {
+      var svgLinkLabels = view.get('svgLinkLabels').data(view.get('d3links'),
+        function(d) { return d.source.id + " " + d.target.id; });
+
+      this.set('svgLinkLabels', svgLinkLabels);
+
+      // show node value inputs/labels
+      var labels = svgLinkLabels.enter().append('svg:foreignObject')
+        .attr('class', 'svg-label edge-label')
+        .attr('width', 55)
+        .attr('height', 40);
+
+      labels.append('xhtml:p')
+        .html(function(d) { return d.value || 1; });
+
+      labels.append('xhtml:input')
+        .attr('type', 'text')
+        .attr('class', 'form-control')
+        .attr('value', function(d) {
+          return d.value || 1;
+        })
+        .on('mousedown', function(d) {
+          d3.event.ignore = true;
+        })
+        .on('keydown', function() {
+          d3.event.ignore = true;
+        })
+        .on('change', function(d, i) {
+          d.value = Number(this.value);
+          labels.selectAll('p').html(function(d) { return d.value || 1; });
+        });
+
+      // remove old link labels
+      svgLinkLabels.exit().remove();
+    }
+
     // remove old links
     svgLinks.exit().remove();
 
     // set the graph in motion
     view.get('forceLayout').start();
 
-  }.observes('d3links.@each'),
+  }.observes('d3links.@each', 'showEdgeValues'),
 
   // -------
   // D3 initialization
@@ -328,6 +378,13 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     // init D3 force layout
     var force = view.get('forceLayout')
       .on('tick', tick);
+
+    var lastTick = 0;
+    function tickAlive() {
+      if(new Date().getTime() > lastTick + 250) tick();
+      setTimeout(tickAlive, 300);
+    }
+    tickAlive(); // WTF hack to keep the SVG inputs active
 
     function tick() {
       var graph = view.get('graph');
@@ -344,26 +401,36 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           sourceX = d.source.x + (sourcePadding * normX),
           sourceY = d.source.y + (sourcePadding * normY),
           targetX = d.target.x - (targetPadding * normX),
-          targetY = d.target.y - (targetPadding * normY);
+          targetY = d.target.y - (targetPadding * normY),
+          midpointX = (targetX + sourceX) / 2,
+          midpointY = (targetY + sourceY) / 2,
+          ctrlDeviation = dist / 5,
+          labelDeviation = 10;
 
         var pathDef = 'L';
         if(graph.isDirected() && graph.getEdge(d.target.id, d.source.id)) {
-          var midpointX = (targetX + sourceX) / 2,
-            midpointY = (targetY + sourceY) / 2,
-            deviation = dist / 5;
-
-          pathDef = "Q" + (midpointX - normY * deviation) +
-            "," + (midpointY + normX * deviation) + ",";
+          labelDeviation = dist / 5;
+          pathDef = 'Q' + (midpointX - normY * ctrlDeviation) +
+            ',' + (midpointY + normX * ctrlDeviation) + ',';
         }
+
+        d.view.labelX = midpointX - normY * labelDeviation;
+        d.view.labelY = midpointY + normX * labelDeviation;
 
         return 'M' + sourceX + ',' + sourceY + pathDef + targetX + ',' + targetY;
       });
+
+      if(view.get('showEdgeValues')) {
+        view.get('svgLinkLabels')
+          .attr('x', function(d) { return d.view.labelX - 25; })
+          .attr('y', function(d) { return d.view.labelY - 17; });
+      }
 
       view.get('svgNodes').attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       });
 
-      setTimeout(tick, 500); // WTF hack to keep the SVG inputs active
+      lastTick = new Date().getTime();
     }
 
     function mousedown() {
@@ -494,6 +561,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   onSvgChange: function() {
     this.set('svgNodes', this.get('svgBaseNodes'));
     this.set('svgLinks', this.get('svgBaseLinks'));
+    this.set('svgLinkLabels', this.get('svgBaseLinkLabels'));
     this.createView();
   }.observes('svg'),
 

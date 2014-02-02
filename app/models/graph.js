@@ -74,7 +74,7 @@ VisualAlgo.Graph = Ember.Object.extend({
     this.foreachNode(function(id) {
       that.foreachAdj(id, function(adj, edgeData) {
         if(id < adj)
-          that.addEdge(id, adj, $.extend({}, edgeData));
+          that.addEdge(id, adj, $.extend(true, {}, edgeData));
       });
     });
   },
