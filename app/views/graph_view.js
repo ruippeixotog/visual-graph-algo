@@ -228,10 +228,10 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     if(view.get('showNodeValues')) {
       // show node value inputs/labels
       var labels = g.append('svg:g')
-        .attr('transform', 'translate(15,15)')
+        .attr('transform', 'translate(10,10)')
         .attr('class', 'node-label')
         .append('svg:foreignObject')
-        .attr('width', 40)
+        .attr('width', 55)
         .attr('height', 40);
 
       labels.append('xhtml:p')
@@ -350,7 +350,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
         return 'translate(' + d.x + ',' + d.y + ')';
       });
 
-      setTimeout(tick, 1000); // WTF hack to keep the SVG inputs active
+      setTimeout(tick, 100); // WTF hack to keep the SVG inputs active
     }
 
     function mousedown() {

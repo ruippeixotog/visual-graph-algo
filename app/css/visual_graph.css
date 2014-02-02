@@ -72,6 +72,14 @@ circle.node.visited {
     fill: #666666;
 }
 
+.node-label p {
+    padding: 7px 13px 7px 13px;
+}
+
+.node-label input {
+    width: 50px;
+}
+
 text {
     font: 12px sans-serif;
     pointer-events: none;
