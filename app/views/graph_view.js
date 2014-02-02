@@ -330,6 +330,8 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .on('tick', tick);
 
     function tick() {
+      var graph = view.get('graph');
+
       // draw directed edges with proper padding from node centers
       view.get('svgLinks').attr('d', function(d) {
         var deltaX = d.target.x - d.source.x,
@@ -338,19 +340,30 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           normX = deltaX / dist,
           normY = deltaY / dist,
           sourcePadding = 12,
-          targetPadding = view.get('graph').isDirected() ? 17 : 12,
+          targetPadding = graph.isDirected() ? 17 : 12,
           sourceX = d.source.x + (sourcePadding * normX),
           sourceY = d.source.y + (sourcePadding * normY),
           targetX = d.target.x - (targetPadding * normX),
           targetY = d.target.y - (targetPadding * normY);
-        return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+
+        var pathDef = 'L';
+        if(graph.isDirected() && graph.getEdge(d.target.id, d.source.id)) {
+          var midpointX = (targetX + sourceX) / 2,
+            midpointY = (targetY + sourceY) / 2,
+            deviation = dist / 5;
+
+          pathDef = "Q" + (midpointX - normY * deviation) +
+            "," + (midpointY + normX * deviation) + ",";
+        }
+
+        return 'M' + sourceX + ',' + sourceY + pathDef + targetX + ',' + targetY;
       });
 
       view.get('svgNodes').attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       });
 
-      setTimeout(tick, 100); // WTF hack to keep the SVG inputs active
+      setTimeout(tick, 500); // WTF hack to keep the SVG inputs active
     }
 
     function mousedown() {
