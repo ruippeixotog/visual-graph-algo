@@ -32,20 +32,22 @@ VisualAlgo.Kruskal = VisualAlgo.GraphAlgorithm.create({
     var edges = [];
     graph.foreachNode(function(node) {
       graph.foreachAdj(node, function(adj, edgeData) {
-        if(node < adj) edges.push([edgeData.value, Number(node), Number(adj)]);
+        if(node < adj) edges.push({
+          src: Number(node), dest: Number(adj), weight: Number(edgeData.value)
+        });
       });
     });
-    edges.sort();
+    edges.sort(function(a, b) { return a.weight > b.weight });
 
     for(var i = 0; i < edges.length; i++) {
       var e = edges[i];
-      var edgeData = graph.getEdge(e[1], e[2]);
+      var edgeData = graph.getEdge(e.src, e.dest);
 
       edgeData.view.classes = ["current"];
       yield this.step;
 
-      if(!uf.isSameSet(e[1], e[2])) {
-        uf.unionSet(e[1], e[2]);
+      if(!uf.isSameSet(e.src, e.dest)) {
+        uf.unionSet(e.src, e.dest);
 
         edgeData.view.classes = ["solution"];
 //        graph.getNode(e[1]).view.style = "fill: " + colorFor(e[1]);
