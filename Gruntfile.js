@@ -2,11 +2,27 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
 
+    // compile LESS files
+    less: {
+      compile: {
+        files: [
+          {
+            expand: true,
+            cwd: 'app/less',
+            src: ['*.less'],
+            dest: 'dependencies/compiled/',
+            ext: '.css'
+          }
+        ]
+      }
+    },
+
     // concatenates and minifies CSS files
     cssmin: {
       combine: {
         files: {
-          'build/application.min.css': ['app/css/sb-admin.css', 'app/css/visual_graph.css']
+          'build/application.min.css': ['app/css/sb-admin.css', 'app/css/visual_graph.css',
+            'dependencies/compiled/*.css']
         }
       }
     },
@@ -41,8 +57,12 @@ module.exports = function(grunt) {
         tasks: ['neuter']
       },
       css_stylesheets: {
-        files: ['app/**/*.css'],
+        files: ['app/css/*.css'],
         tasks: ['cssmin']
+      },
+      less_stylesheets: {
+        files: ['app/less/*.less'],
+        tasks: ['less', 'cssmin']
       },
       handlebars_templates: {
         files: ['app/templates/**/*.hbs'],
@@ -51,6 +71,7 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-ember-templates');
   grunt.loadNpmTasks('grunt-neuter');
@@ -61,10 +82,10 @@ module.exports = function(grunt) {
     Default task. Compiles templates, neuters application code, and begins
     watching for changes.
   */
-  grunt.registerTask('default', ['cssmin', 'emberTemplates', 'neuter', 'watch']);
+  grunt.registerTask('default', ['less', 'cssmin', 'emberTemplates', 'neuter', 'watch']);
 
   /*
     Build task. Runs everything as the default task, but without the watch.
    */
-  grunt.registerTask('build', ['cssmin', 'emberTemplates', 'neuter']);
+  grunt.registerTask('build', ['less', 'cssmin', 'emberTemplates', 'neuter']);
 };

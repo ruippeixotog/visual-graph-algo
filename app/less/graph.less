@@ -1,0 +1,68 @@
+.graph {
+
+  .svg-label {
+    p {
+      padding: 7px 13px 7px 13px;
+      margin-right: 5px;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    input {
+      display: none;
+      width: 50px;
+      text-align: center;
+    }
+  }
+
+  circle.node {
+      stroke-width: 1.5px;
+      stroke: black;
+      cursor: pointer;
+      fill: #dddddd;
+  }
+
+  circle.node.selected {
+      fill: #eeeeee;
+  }
+
+  circle.node.selected ~ .node-label p {
+      display: none;
+  }
+
+  circle.node.selected ~ .node-label input {
+      display: block;
+  }
+
+  circle.node.current {
+      fill: red;
+  }
+
+  circle.node.visited {
+      fill: #666666;
+  }
+
+  circle.node.solution {
+      fill: green;
+  }
+
+  path.link.current {
+      stroke: red;
+  }
+
+  path.link.visited {
+      stroke: #eeeeee;
+  }
+
+  path.link.solution {
+      stroke: green;
+  }
+
+  .edge-label.selected p {
+      display: none;
+  }
+
+  .edge-label.selected input {
+      display: block;
+  }
+}

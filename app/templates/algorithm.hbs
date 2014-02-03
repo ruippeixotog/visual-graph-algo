@@ -1,8 +1,10 @@
-{{view inputView}}
+<div {{bindAttr id=domId}}>
+    {{view inputView}}
 
-<hr>
+    <hr>
 
-<div class="algo-input">
-  <button class="btn btn-default" {{action 'start'}}>Start</button>
-  <button class="algo-next btn btn-default" {{action 'next'}}>Next step</button>
+    <div class="algo-input">
+        <button class="btn btn-default" {{action 'start'}}>Start</button>
+        <button class="algo-next btn btn-default" {{action 'next'}}>Next step</button>
+    </div>
 </div>

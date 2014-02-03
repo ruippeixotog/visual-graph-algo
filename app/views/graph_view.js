@@ -79,6 +79,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
     var svg = d3.select("#graph-wrapper")
       .append('svg')
+      .attr('class', 'graph')
       .attr('width', '100%')
       .attr('height', '70%') // TODO: make the graph occupy all available space
       .attr('viewBox', '0 0 ' + this.get('svgWidth') + ' ' + this.get('svgHeight'))
