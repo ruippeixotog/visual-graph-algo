@@ -81,6 +81,22 @@ circle.node.visited {
     fill: #666666;
 }
 
+circle.node.solution {
+    fill: green;
+}
+
+path.link.current {
+    stroke: red;
+}
+
+path.link.visited {
+    stroke: #eeeeee;
+}
+
+path.link.solution {
+    stroke: green;
+}
+
 .edge-label.selected p {
     display: none;
 }

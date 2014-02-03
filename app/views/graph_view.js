@@ -141,6 +141,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
         d.view = d.view || {};
         return $.merge(['node'], d.view.classes || []).join(' ');
       })
+      .attr('style', function(d) { return d.view.style; })
       .classed('selected', function(d) { return d === view.get('selectedNode'); });
 
     svgNodes.selectAll('.node-label')
@@ -158,11 +159,12 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     var g = svgNodes.enter().append('svg:g');
 
     g.append('svg:circle')
+      .attr('r', 12)
       .attr('class', function(d) {
         d.view = d.view || {};
         return $.merge(['node'], d.view.classes || []).join(' ');
       })
-      .attr('r', 12)
+      .attr('style', function(d) { return d.view.style; })
       .classed('selected', function(d) { return d === view.get('selectedNode'); })
       .attr('data-nodeid', function(d) { return d.id; })
       .on('mouseover', function(d) {
@@ -289,7 +291,11 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
     // update existing links
     svgLinks
-      .attr('class', function(d) { return $.merge(['link'], d.view.classes || []).join(' '); })
+      .attr('class', function(d) {
+        d.view = d.view || {};
+        return $.merge(['link'], d.view.classes || []).join(' ');
+      })
+      .attr('style', function(d) { return d.view.style; })
       .classed('selected', function(d) { return d === view.get('selectedLink'); })
       .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '');
 
@@ -310,6 +316,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
         d.view = d.view || {};
         return $.merge(['link'], d.view.classes || []).join(' ');
       })
+      .attr('style', function(d) { return d.view.style; })
       .classed('selected', function(d) { return d === view.get('selectedLink'); })
       .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '')
       .on('mousedown', function(d) {
