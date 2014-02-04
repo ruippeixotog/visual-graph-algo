@@ -1,7 +1,7 @@
 VisualAlgo.Algorithm = Ember.Object.extend(VisualAlgo.AlgorithmEvents, {
   name: "",
 
-  domId: function() {
+  domClass: function() {
     return "algo-" + this.get('name').replace(" ", "-").toLowerCase();
   }.property('name'),
 

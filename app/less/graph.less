@@ -1,5 +1,69 @@
 .graph {
 
+  background-color: #FFF;
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+
+  &:not(.active):not(.ctrl) {
+    cursor: crosshair;
+  }
+
+  &:not(.active):not(.ctrl) .link {
+    cursor: pointer;
+  }
+
+  .node {
+    stroke-width: 1.5px;
+    stroke: black;
+    cursor: pointer;
+    fill: #dddddd;
+
+    &.selected {
+      fill: #eeeeee;
+
+      & ~ .node-label p {
+        display: none;
+      }
+
+      & ~ .node-label input {
+        display: block;
+      }
+    }
+  }
+
+  .link {
+    fill: none;
+    stroke: #000;
+    stroke-width: 4px;
+    cursor: default;
+
+    &.selected {
+      stroke-dasharray: 10,2;
+    }
+
+    &.dragline {
+      pointer-events: none;
+    }
+
+    &.hidden {
+      stroke-width: 0;
+    }
+  }
+
+  text {
+    font: 12px sans-serif;
+    pointer-events: none;
+  }
+
+  text.id {
+    text-anchor: middle;
+    font-weight: bold;
+  }
+
   .svg-label {
     p {
       padding: 7px 13px 7px 13px;
@@ -15,54 +79,13 @@
     }
   }
 
-  circle.node {
-      stroke-width: 1.5px;
-      stroke: black;
-      cursor: pointer;
-      fill: #dddddd;
-  }
-
-  circle.node.selected {
-      fill: #eeeeee;
-  }
-
-  circle.node.selected ~ .node-label p {
+  .svg-label.selected {
+    p {
       display: none;
-  }
+    }
 
-  circle.node.selected ~ .node-label input {
+    input {
       display: block;
-  }
-
-  circle.node.current {
-      fill: red;
-  }
-
-  circle.node.visited {
-      fill: #666666;
-  }
-
-  circle.node.solution {
-      fill: green;
-  }
-
-  path.link.current {
-      stroke: red;
-  }
-
-  path.link.visited {
-      stroke: #eeeeee;
-  }
-
-  path.link.solution {
-      stroke: green;
-  }
-
-  .edge-label.selected p {
-      display: none;
-  }
-
-  .edge-label.selected input {
-      display: block;
+    }
   }
 }
