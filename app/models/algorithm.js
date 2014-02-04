@@ -1,9 +1,13 @@
 VisualAlgo.Algorithm = Ember.Object.extend(VisualAlgo.AlgorithmEvents, {
   name: "",
 
-  domClass: function() {
-    return "algo-" + this.get('name').replace(" ", "-").toLowerCase();
+  id: function() {
+    return this.get('name').replace(" ", "-").toLowerCase();
   }.property('name'),
+
+  domClass: function() {
+    return "algo-" + this.get('id');
+  }.property('id'),
 
   inputView: Ember.View.extend({}),
 
