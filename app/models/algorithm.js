@@ -1,5 +1,6 @@
 VisualAlgo.Algorithm = Ember.Object.extend(VisualAlgo.AlgorithmEvents, {
   name: "",
+  categories: null,
 
   id: function() {
     return this.get('name').replace(" ", "-").toLowerCase();
@@ -20,6 +21,6 @@ VisualAlgo.Algorithm = Ember.Object.extend(VisualAlgo.AlgorithmEvents, {
   }.property(),
   
   init: function() {
-    VisualAlgo.AlgorithmStore.get("algorithms").push(this);
+    VisualAlgo.RootAlgorithmStore.add(this);
   }
 });

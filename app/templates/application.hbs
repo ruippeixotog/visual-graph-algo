@@ -16,18 +16,27 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse navbar-ex1-collapse">
       <ul class="nav navbar-nav side-nav">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-caret-square-o-down"></i> Algorithms <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            {{#each algorithms}}
-              <li>
-                {{#link-to "algorithm" this currentWhen="algorithm"}}
-                  {{name}}
-                {{/link-to}}
-              </li>
-            {{/each}}
-          </ul>
-        </li>
+        {{#each categories}}
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-caret-square-o-down"></i> {{name}} <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                {{#each algorithms}}
+                  <li>
+                    {{#link-to "algorithm" this currentWhen="algorithm"}}
+                      {{name}}
+                    {{/link-to}}
+                  </li>
+                {{/each}}
+              </ul>
+          </li>
+        {{/each}}
+        {{#each algorithms}}
+          <li>
+            {{#link-to "algorithm" this currentWhen="algorithm"}}
+              {{name}}
+            {{/link-to}}
+          </li>
+        {{/each}}
       </ul>
 
       <ul class="nav navbar-nav navbar-right navbar-user">

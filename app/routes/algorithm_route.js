@@ -1,11 +1,15 @@
 VisualAlgo.AlgorithmRoute = Ember.Route.extend({
   model: function(params) {
-    return VisualAlgo.AlgorithmStore.get('algorithms').find(function(algo) {
+    var store = params.category && params.category != "all" ?
+      VisualAlgo.RootAlgorithmStore.get(params.category) :
+      VisualAlgo.RootAlgorithmStore;
+
+    return store.get('algorithms').find(function(algo) {
       return algo.get('id') == params.id;
     });
   },
 
   serialize: function(model) {
-    return { id: model.get('id') };
+    return { id: model.get('id'), category: model.get('categories.0') || "all"  };
   }
 });
