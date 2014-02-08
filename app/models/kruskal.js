@@ -18,15 +18,19 @@ VisualAlgo.Kruskal = VisualAlgo.GraphAlgorithm.create({
     var uf = VisualAlgo.UnionFind.create();
     uf.initSet(graph.getNodeCount());
 
-//    function colorFor(node) {
-//      var hexStr = Math.floor(
-//        63 + (uf.findSet(node) + 1) / graph.getNodeCount() * 192).toString(16);
-//      return "#" + hexStr + hexStr + hexStr;
-//    }
-//
-//    graph.foreachNode(function(node, nodeData) {
-//      nodeData.view.style = "fill: " + colorFor(Number(node));
-//    });
+    var color = d3.scale.category20();
+//    var scale = d3.scale.linear()
+//      .domain([0, graph.getNodeCount()])
+//      .range(["white", "#0000dd"]);
+
+    function updateColors() {
+      graph.foreachNode(function(node, nodeData) {
+        nodeData.view.style = "fill: " +
+          d3.rgb(color(uf.findSet(Number(node)))).brighter(0.8).toString()
+      });
+    }
+
+    updateColors();
 
     // get all edges into an array and sort them by weight
     var edges = [];
@@ -48,10 +52,8 @@ VisualAlgo.Kruskal = VisualAlgo.GraphAlgorithm.create({
 
       if(!uf.isSameSet(e.src, e.dest)) {
         uf.unionSet(e.src, e.dest);
-
         edgeData.view.classes = ["solution"];
-//        graph.getNode(e[1]).view.style = "fill: " + colorFor(e[1]);
-//        graph.getNode(e[2]).view.style = "fill: " + colorFor(e[2]);
+        updateColors();
 
       } else {
         edgeData.view.classes = ["visited"];

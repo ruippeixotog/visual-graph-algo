@@ -3,10 +3,17 @@ VisualAlgo.AlgorithmController = Ember.ObjectController.extend(Ember.TargetActio
   finished: false,
 
   alertFinished: function() {
-    if(this.get('finished')) alert('Finished!');
+    if(this.get('finished')) alert("Finished!");
   }.observes('finished'),
 
   actions: {
+    reset: function() {
+      this.get('model').reset();
+      this.set('algoState', null);
+      this.set('finished', false);
+      this.set('model.shouldRedraw', true);
+    },
+
     start: function() {
       this.get('model').reset();
 
@@ -17,7 +24,8 @@ VisualAlgo.AlgorithmController = Ember.ObjectController.extend(Ember.TargetActio
     },
 
     next: function() {
-      if(this.get('finished')) return;
+      if(this.get('finished')) { alert("Already finished!"); return; }
+      else if(!this.get('algoState')) { alert("Not yet started!"); return; }
 
       var step = false;
       while(!this.get('finished') && !step) {

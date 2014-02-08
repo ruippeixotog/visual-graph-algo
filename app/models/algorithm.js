@@ -16,6 +16,7 @@ VisualAlgo.Algorithm = Ember.Object.extend(VisualAlgo.AlgorithmEvents, {
 
   // view-related functions; this should not be in the model
   reset: function() {},
+
   shouldRedraw: function() {
     return false;
   }.property(),
