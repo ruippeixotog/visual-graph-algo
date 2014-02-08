@@ -1,5 +1,7 @@
 <div {{bindAttr class=domClass}}>
-    {{view inputView}}
+    {{#with inputView as iv}}
+        {{view iv}}
+    {{/with}}
 
     <hr>
 
