@@ -9,6 +9,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
   showNodeValues: false,
   showEdgeValues: false,
+  disableEditingBinding: 'controller.algoState',
 
   // -------
   // graph data stored in a D3 handy way
@@ -67,6 +68,12 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     this.set('mouseupNode', null);
     this.set('mousedownLink', null);
   },
+
+  onEditingDisabled: function() {
+    this.resetMouseVars();
+    this.set('selectedNode', null);
+    this.set('selectedLink', null);
+  }.observes('disableEditing'),
 
   // -------
   // D3 view components
@@ -179,7 +186,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
         d3.select(this).attr('transform', '');
       })
       .on('mousedown', function(d) {
-        if(d3.event.ctrlKey) return;
+        if(d3.event.ctrlKey || view.get('disableEditing')) return;
 
         // select node
         view.set('mousedownNode', d);
@@ -321,7 +328,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .classed('selected', function(d) { return d === view.get('selectedLink'); })
       .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '')
       .on('mousedown', function(d) {
-        if(d3.event.ctrlKey) return;
+        if(d3.event.ctrlKey || view.get('disableEditing')) return;
 
         // select link
         view.set('mousedownLink', d);
@@ -444,7 +451,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     }
 
     function mousedown() {
-      if(d3.event.ignore) return;
+      if(d3.event.ignore || view.get('disableEditing')) return;
       // prevent I-bar on drag
       //d3.event.preventDefault();
 
