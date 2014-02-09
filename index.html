@@ -33,7 +33,7 @@
         eval('(function* () { yield 1; }())');
         scr.src = "dist/application.es6.js";
       } catch (e) {
-        console.log("ECMAScript is not supported by this browser. Generators were precompiled and source maps are not available.");
+        console.log("ECMAScript 6 is not supported by this browser. Generators were precompiled and source maps are not available.");
         scr.src = "dist/application.js";
       }
       document.body.appendChild(scr);
