@@ -9,6 +9,8 @@
   "repository": "",
   "devDependencies": {
     "grunt": "~0.4.1",
+    "grunt-traceur": "0.0.3",
+    "grunt-regenerator": "0.2.1",
     "grunt-neuter": "~0.6.0",
     "grunt-contrib-uglify": "0.3.2",
     "grunt-ember-templates": "0.4.14",
