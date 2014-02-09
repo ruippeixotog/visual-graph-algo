@@ -44,18 +44,25 @@ module.exports = function(grunt) {
         sourceRoot: "..",
         template: "{%= src %}"
       },
-      'dist/application.js': ['app/app.js']
+      'dist/application.es6.js': ['app/app.js']
     },
 
     // uglify: {
     //   'build/application.min.js': 'build/application.js'
     // },
 
+    regenerator: {
+      options: {
+        includeRuntime: true
+      },
+      'dist/application.js': 'dist/application.es6.js'
+    },
+
     // watch files for changes
     watch: {
       application_code: {
         files: ['dependencies/**/*.js', 'app/**/*.js'],
-        tasks: ['neuter']
+        tasks: ['neuter', 'regenerator']
       },
       css_stylesheets: {
         files: ['app/css/*.css'],
@@ -67,7 +74,7 @@ module.exports = function(grunt) {
       },
       handlebars_templates: {
         files: ['app/templates/**/*.hbs'],
-        tasks: ['emberTemplates', 'neuter']
+        tasks: ['emberTemplates', 'neuter', 'regenerator']
       }
     }
   });
@@ -76,6 +83,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-ember-templates');
   grunt.loadNpmTasks('grunt-neuter');
+  grunt.loadNpmTasks('grunt-regenerator');
   // grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
@@ -83,10 +91,10 @@ module.exports = function(grunt) {
     Default task. Compiles templates, neuters application code, and begins
     watching for changes.
   */
-  grunt.registerTask('default', ['less', 'cssmin', 'emberTemplates', 'neuter', 'watch']);
+  grunt.registerTask('default', ['less', 'cssmin', 'emberTemplates', 'neuter', 'regenerator', 'watch']);
 
   /*
     Build task. Runs everything as the default task, but without the watch.
    */
-  grunt.registerTask('build', ['less', 'cssmin', 'emberTemplates', 'neuter']);
+  grunt.registerTask('build', ['less', 'cssmin', 'emberTemplates', 'neuter', 'regenerator']);
 };

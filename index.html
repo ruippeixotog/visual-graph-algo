@@ -27,6 +27,16 @@
         load the ember application. This file comes from the files in /app
         as part of the grunt build process
       -->
-    <script src="dist/application.js"></script>
+    <script>
+      var scr = document.createElement("script");
+      try {
+        eval('(function* () { yield 1; }())');
+        scr.src = "dist/application.es6.js";
+      } catch (e) {
+        console.log("ECMAScript is not supported by this browser. Generators were precompiled and source maps are not available.");
+        scr.src = "dist/application.js";
+      }
+      document.body.appendChild(scr);
+    </script>
   </body>
 </html>
