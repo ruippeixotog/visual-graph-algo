@@ -1,4 +1,4 @@
-require('dependencies/compiled/templates');
+require('build/templates/templates');
 
 VisualAlgo = Ember.Application.create({
   rootElement: '#visualalgoapp',

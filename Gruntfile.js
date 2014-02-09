@@ -10,7 +10,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'app/less',
             src: ['*.less'],
-            dest: 'dependencies/compiled/',
+            dest: 'build/less/',
             ext: '.css'
           }
         ]
@@ -21,8 +21,8 @@ module.exports = function(grunt) {
     cssmin: {
       combine: {
         files: {
-          'build/application.min.css': ['app/css/sb-admin.css', 'app/css/visual_graph.css',
-            'dependencies/compiled/*.css']
+          'dist/application.min.css': ['app/css/sb-admin.css', 'app/css/visual_graph.css',
+            'build/less/*.css']
         }
       }
     },
@@ -34,16 +34,17 @@ module.exports = function(grunt) {
           return sourceFile.replace(/app\/templates\//, '');
         }
       },
-      'dependencies/compiled/templates.js': ["app/templates/**/*.hbs"]
+      'build/templates/templates.js': ["app/templates/**/*.hbs"]
     },
 
     // concatenate JavaScript code in one file
     neuter: {
       options: {
         includeSourceMap: true,
-        sourceRoot: ".."
+        sourceRoot: "..",
+        template: "{%= src %}"
       },
-      'build/application.js': ['app/app.js']
+      'dist/application.js': ['app/app.js']
     },
 
     // uglify: {
