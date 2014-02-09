@@ -1,6 +1,6 @@
 VisualAlgo.AlgorithmRoute = Ember.Route.extend({
   model: function(params) {
-    var store = params.category && params.category != "all" ?
+    var store = params.category && params.category != "misc" ?
       VisualAlgo.RootAlgorithmStore.get(params.category) :
       VisualAlgo.RootAlgorithmStore;
 
@@ -10,6 +10,6 @@ VisualAlgo.AlgorithmRoute = Ember.Route.extend({
   },
 
   serialize: function(model) {
-    return { id: model.get('id'), category: model.get('categories.0') || "all"  };
+    return { id: model.get('id'), category: model.get('categories.0') || "misc"  };
   }
 });
