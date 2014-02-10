@@ -17,17 +17,16 @@ module.exports = function(grunt) {
       }
     },
 
-    // concatenates and minifies CSS files
+    // concatenate and minify CSS files
     cssmin: {
       combine: {
         files: {
-          'dist/application.min.css': ['app/css/sb-admin.css', 'app/css/visual_graph.css',
-            'build/less/*.css']
+          'dist/application.min.css': ['app/css/application.css', 'build/less/*.css']
         }
       }
     },
 
-    // finds Handlebars templates and precompiles them into functions
+    // find Handlebars templates and precompile them into functions
     emberTemplates: {
       options: {
         templateName: function(sourceFile) {
@@ -51,6 +50,7 @@ module.exports = function(grunt) {
     //   'build/application.min.js': 'build/application.js'
     // },
 
+    // compile ECMAScript 6 generators into ES5 code
     regenerator: {
       options: {
         includeRuntime: true

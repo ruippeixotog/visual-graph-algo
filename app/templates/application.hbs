@@ -1,7 +1,8 @@
-<div id="wrapper">
+<div id="outer-wrapper">
 
   <!-- Sidebar -->
   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -10,7 +11,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Interactive graph algorithms</a>
+      <a class="navbar-brand" href="#">Interactive graph algorithms</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -38,13 +39,10 @@
           </li>
         {{/each}}
       </ul>
-
-      <ul class="nav navbar-nav navbar-right navbar-user">
-      </ul>
     </div><!-- /.navbar-collapse -->
   </nav>
 
-  <div id="page-wrapper">
+  <div id="content-wrapper">
     {{outlet}}
   </div><!-- /#page-wrapper -->
 
