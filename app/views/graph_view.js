@@ -78,8 +78,13 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   // -------
   // D3 view components
 
-  svgWidth: 800,
-  svgHeight: 600,
+  svgWidth: function() {
+    return Math.max(200, Math.min(800, this.$().width()));
+  }.property(),
+
+  svgHeight: function() {
+    return Math.max(150, Math.min(600, this.$().height()));
+  }.property(),
 
   svg: function() {
     d3.select("#graph-wrapper svg").remove();
@@ -117,16 +122,29 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
     return svg;
 
-  }.property('graph', 'svgWidth', 'svgHeight'),
+  }.property('graph'),
+
+  onSvgResize: function() {
+    this.get('svg').attr('viewBox', '0 0 ' + this.get('svgWidth') + ' ' + this.get('svgHeight'));
+  }.observes('svgWidth', 'svgHeight'),
+
+  linkDistance: function() {
+    return Math.max(75, this.get('svgWidth') * 0.1875);
+  }.property('svgWidth'),
+
+  nodeCharge: function() {
+    return -this.get('svgWidth') * 0.625;
+  }.property('svgWidth'),
 
   forceLayout: function() {
     return d3.layout.force()
       .nodes(this.get('d3nodes'))
       .links(this.get('d3links'))
       .size([this.get('svgWidth'), this.get('svgHeight')])
-      .linkDistance(150)
-      .charge(-500);
-  }.property('d3nodes', 'd3links', 'svgWidth', 'svgHeight'),
+      .linkDistance(this.get('linkDistance'))
+      .charge(this.get('nodeCharge'))
+      .on('tick', this.get('tickFunc'));
+  }.property('d3nodes', 'd3links', 'svgWidth', 'svgHeight', 'linkDistance', 'nodeCharge'),
 
   // -------
   // D3 node drawing
@@ -385,18 +403,10 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   // -------
   // D3 initialization
 
-  createView: function() {
+  tickFunc: function() {
     var view = this;
-    var svg = view.get('svg');
-
-    // set up initial nodes and links
-    this.syncWithModel();
-
-    // init D3 force layout
-    var force = view.get('forceLayout')
-      .on('tick', tick);
-
     var lastTick = 0;
+
     function tickAlive() {
       if(new Date().getTime() > lastTick + 250) tick();
       setTimeout(tickAlive, 300);
@@ -449,6 +459,16 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
       lastTick = new Date().getTime();
     }
+
+    return tick;
+  }.property(),
+
+  createView: function() {
+    var view = this;
+    var svg = view.get('svg');
+
+    // set up initial nodes and links
+    this.syncWithModel();
 
     function mousedown() {
       if(d3.event.ignore || view.get('disableEditing')) return;
@@ -514,7 +534,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
       // ctrl
       if(d3.event.keyCode === 17) {
-        view.get('svgNodes').call(force.drag);
+        view.get('svgNodes').call(view.get('forceLayout').drag);
         svg.classed('ctrl', true);
       }
 
@@ -555,13 +575,33 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       }
     }
 
+    var lastResize = 0;
+
+    function resize() {
+      lastResize = new Date().getTime();
+      var t = lastResize;
+
+      setTimeout(function() {
+        if(t != lastResize) return;
+
+        var width = Math.max(200, Math.min(800, view.$().width()));
+        var height = Math.max(150, Math.min(600, view.$().height()));
+
+        view.set('svgWidth', width);
+        view.set('svgHeight', height);
+        view.get('forceLayout').start();
+
+      }, 200);
+    }
+
     // app starts here
     svg.on('mousedown', mousedown)
       .on('mousemove', mousemove)
       .on('mouseup', mouseup);
     d3.select(window)
       .on('keydown', keydown)
-      .on('keyup', keyup);
+      .on('keyup', keyup)
+      .on('resize', resize);
   },
 
   redraw: function() {
