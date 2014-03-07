@@ -184,6 +184,132 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     // add new nodes
     var g = svgNodes.enter().append('svg:g');
 
+    // --- events for the circle elements ---
+
+    function mousedown(d) {
+      if(d3.event.ctrlKey || view.get('disableEditing')) return;
+      view.set('mousedownNode', d);
+
+      // select/unselect the node and possibly unselect any selected link
+      if(view.get('mousedownNode') === view.get('selectedNode')) view.set('selectedNode', null);
+      else view.set('selectedNode', view.get('mousedownNode'));
+      view.set('selectedLink', null);
+
+      // show and initialize the position of the drag line
+      view.get('dragLine')
+        .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '')
+        .classed('hidden', false)
+        .attr('d', 'M' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y +
+          'L' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y);
+    }
+
+    function mouseup(d) {
+      if(!view.get('mousedownNode')) return;
+      view.set('mouseupNode', d);
+
+      // hide the drag line, if applicable
+      view.get('dragLine')
+        .classed('hidden', true)
+        .style('marker-end', '');
+
+      // check for a drag-to-self action
+      if(view.get('mouseupNode') === view.get('mousedownNode')) {
+        view.resetMouseVars();
+        return;
+      }
+
+      // unenlarge target node, if applicable
+      d3.select(this).attr('transform', '');
+
+      // add link to graph if it not exists already
+      var source = view.get('mousedownNode'),
+        target = view.get('mouseupNode');
+
+      var link = null;
+      if(!view.get('graph').getEdge(source.id, target.id)) {
+        link = view.get('graph').addEdge(source.id, target.id, { source: source, target: target });
+        view.get('d3links').pushObject(link);
+      }
+
+      // select the new link
+      view.set('selectedLink', link);
+      view.set('selectedNode', null);
+    }
+
+    function mouseover(d) {
+      if(!view.get('mousedownNode') || d === view.get('mousedownNode')) return;
+
+      // if a mousedown node is defined and it's not the current one (i.e. a drag is happening),
+      // enlarge target node
+      d3.select(this).attr('transform', 'scale(1.1)');
+    }
+
+    function mouseout(d) {
+      if(!view.get('mousedownNode') || d === view.get('mousedownNode')) return;
+
+      // if a mousedown node is defined and it's not the current one (i.e. a drag is happening),
+      // unenlarge target node
+      d3.select(this).attr('transform', '');
+    }
+
+    function touchstart(d) {
+      d3.event.preventDefault();
+
+      // do the normal mousedown actions
+      mousedown.bind(this)(d);
+
+      // create an object representing the state of this touch start
+      var touchState = { ended: false, moved: false };
+      view.set('touchState', touchState);
+
+      // schedule a check for 750ms later in order to verify if this is a long touch
+      setTimeout(function() {
+
+        // if there wasn't a touchend event and the touch hasn't moved outside this node,
+        // remove the node
+        if(!touchState.ended && !touchState.moved)
+          view.removeSelected();
+      }, 750);
+    }
+
+    function touchend(d) {
+      d3.event.preventDefault();
+
+      // WARNING: unlike the mouseup event, which is triggered on the element in which the mouse
+      // button was released, the touchend event is always triggered on the starting element
+
+      // get the element in which the touch ended
+      var touch = d3.event.changedTouches[0];
+      var elem = document.elementFromPoint(touch.pageX, touch.pageY);
+
+      // if it is a circle element, do the normal mouseup actions on the target node
+      if(elem.tagName === 'circle') {
+        mouseup.bind(this)(d3.select(elem).datum());
+
+      } else {
+        if(view.get('mousedownNode')) {
+
+          // hide drag line
+          view.get('dragLine')
+            .classed('hidden', true)
+            .style('marker-end', '');
+        }
+
+        // because :active only works in WebKit?
+        view.get('svg').classed('active', false);
+
+        // clear mouse event vars
+        view.resetMouseVars();
+      }
+
+      // set the ended flag for the current touch state object and set the current state to null
+      // (the touchstart scheduled timeout will still act on the former object)
+      view.get('touchState').ended = true;
+      view.set('touchState', null);
+    }
+
+    // --- ---
+
     g.append('svg:circle')
       .attr('r', 12)
       .attr('class', function(d) {
@@ -193,62 +319,12 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .attr('style', function(d) { return d.view.style; })
       .classed('selected', function(d) { return d === view.get('selectedNode'); })
       .attr('data-nodeid', function(d) { return d.id; })
-      .on('mouseover', function(d) {
-        if(!view.get('mousedownNode') || d === view.get('mousedownNode')) return;
-        // enlarge target node
-        d3.select(this).attr('transform', 'scale(1.1)');
-      })
-      .on('mouseout', function(d) {
-        if(!view.get('mousedownNode') || d === view.get('mousedownNode')) return;
-        // unenlarge target node
-        d3.select(this).attr('transform', '');
-      })
-      .on('mousedown', function(d) {
-        if(d3.event.ctrlKey || view.get('disableEditing')) return;
-
-        // select node
-        view.set('mousedownNode', d);
-        if(view.get('mousedownNode') === view.get('selectedNode')) view.set('selectedNode', null);
-        else view.set('selectedNode', view.get('mousedownNode'));
-        view.set('selectedLink', null);
-
-        // reposition drag line
-        view.get('dragLine')
-          .style('marker-end', view.get('graph').isDirected() ? 'url(#end-arrow)' : '')
-          .classed('hidden', false)
-          .attr('d', 'M' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y +
-            'L' + view.get('mousedownNode').x + ',' + view.get('mousedownNode').y);
-      })
-      .on('mouseup', function(d) {
-        if(!view.get('mousedownNode')) return;
-
-        // needed by FF
-        view.get('dragLine')
-          .classed('hidden', true)
-          .style('marker-end', '');
-
-        // check for drag-to-self
-        view.set('mouseupNode', d);
-        if(view.get('mouseupNode') === view.get('mousedownNode')) { view.resetMouseVars(); return; }
-
-        // unenlarge target node
-        d3.select(this).attr('transform', '');
-
-        // add link to graph (update if exists)
-        var source = view.get('mousedownNode'),
-          target = view.get('mouseupNode');
-
-        var link = null;
-        if(!view.get('graph').getEdge(source.id, target.id)) {
-          link = view.get('graph').addEdge(source.id, target.id,
-            { source: source, target: target });
-          view.get('d3links').pushObject(link);
-        }
-
-        // select new link
-        view.set('selectedLink', link);
-        view.set('selectedNode', null);
-      });
+      .on('mousedown', mousedown)
+      .on('mouseup', mouseup)
+      .on('mouseover', mouseover)
+      .on('mouseout', mouseout)
+      .on('touchstart', touchstart)
+      .on('touchend', touchend);
 
     // show node IDs
     g.append('svg:text')
@@ -272,12 +348,8 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       .attr('type', 'text')
       .attr('class', 'form-control')
       .attr('value', function(d) { return d.value || 1; })
-      .on('mousedown', function(d) {
-        d3.event.ignore = true;
-      })
-      .on('keydown', function() {
-        d3.event.ignore = true;
-      })
+      .on('mousedown', function(d) { d3.event.ignore = true; })
+      .on('keydown', function() { d3.event.ignore = true; })
       .on('change', function(d, i) {
         d.value = Number(this.value);
         labels.selectAll('p').html(function(d) { return d.value || 1; });
@@ -401,6 +473,38 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
   }.observes('d3links.@each'),
 
   // -------
+  // graph view actions
+
+  removeSelected: function() {
+    var view = this;
+
+    function removeLinksForNode(node) {
+      var toSplice = view.get('d3links').filter(function(l) {
+        return (l.source === node || l.target === node);
+      });
+      toSplice.map(function(l) {
+        view.get('d3links').replace(view.get('d3links').indexOf(l), 1);
+      });
+    }
+
+    if(view.get('selectedNode')) {
+      view.get('d3nodes').replace(view.get('d3nodes').indexOf(view.get('selectedNode')), 1);
+      removeLinksForNode(view.get('selectedNode'));
+      view.get('graph').removeNode(view.get('selectedNode').id);
+
+      view.set('selectedNode', null);
+
+    } else if(view.get('selectedLink')) {
+      view.get('d3links').replace(view.get('d3links').indexOf(view.get('selectedLink')), 1);
+      view.get('graph').removeEdge(
+        view.get('selectedLink').source.id,
+        view.get('selectedLink').target.id);
+
+      view.set('selectedLink', null);
+    }
+  },
+
+  // -------
   // D3 initialization
 
   tickFunc: function() {
@@ -513,15 +617,6 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       view.resetMouseVars();
     }
 
-    function removeLinksForNode(node) {
-      var toSplice = view.get('d3links').filter(function(l) {
-        return (l.source === node || l.target === node);
-      });
-      toSplice.map(function(l) {
-        view.get('d3links').replace(view.get('d3links').indexOf(l), 1);
-      });
-    }
-
     // only respond once per keydown
     var lastKeyDown = -1;
 
@@ -544,21 +639,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           d3.event.preventDefault();
 
         case 46: // delete
-          if(view.get('selectedNode')) {
-            view.get('d3nodes').replace(view.get('d3nodes').indexOf(view.get('selectedNode')), 1);
-            removeLinksForNode(view.get('selectedNode'));
-            view.get('graph').removeNode(view.get('selectedNode').id);
-
-            view.set('selectedNode', null);
-
-          } else if(view.get('selectedLink')) {
-            view.get('d3links').replace(view.get('d3links').indexOf(view.get('selectedLink')), 1);
-            view.get('graph').removeEdge(
-              view.get('selectedLink').source.id,
-              view.get('selectedLink').target.id);
-
-            view.set('selectedLink', null);
-          }
+          view.removeSelected();
           break;
       }
     }
@@ -573,6 +654,20 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
           .on('touchstart.drag', null);
         svg.classed('ctrl', false);
       }
+    }
+
+    function touchmove() {
+
+      if(view.get('touchState')) {
+        d3.event.preventDefault();
+
+        var touch = d3.event.changedTouches[0];
+        var elem = document.elementFromPoint(touch.pageX, touch.pageY);
+
+        if(elem.tagName !== 'circle' || d3.select(elem).datum() != view.get('mousedownNode'))
+          view.get('touchState').moved = true;
+      }
+      mousemove.bind(this)();
     }
 
     var lastResize = 0;
@@ -597,7 +692,8 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
     // app starts here
     svg.on('mousedown', mousedown)
       .on('mousemove', mousemove)
-      .on('mouseup', mouseup);
+      .on('mouseup', mouseup)
+      .on('touchmove', touchmove);
     d3.select(window)
       .on('keydown', keydown)
       .on('keyup', keyup)
