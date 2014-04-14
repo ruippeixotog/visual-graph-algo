@@ -1,4 +1,4 @@
-VisualAlgo.AlgorithmRoute = Ember.Route.extend({
+VisualAlgo.CategoriesRoute = Ember.Route.extend({
   model: function(params) {
     var store = params.category && params.category != "misc" ?
       VisualAlgo.RootAlgorithmStore.get(params.category) :
@@ -7,6 +7,10 @@ VisualAlgo.AlgorithmRoute = Ember.Route.extend({
     return store.get('algorithms').find(function(algo) {
       return algo.get('id') == params.id;
     });
+  },
+
+  afterModel: function(algo) {
+    this.transitionTo('algorithms.' + algo.get('id'));
   },
 
   serialize: function(model) {

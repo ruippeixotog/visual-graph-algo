@@ -14,6 +14,26 @@ VisualAlgo.AlgorithmStore = Ember.Object.extend({
     } else {
       this.get('algorithms').pushObject(algo);
     }
+
+    VisualAlgo.Router.map(function () {
+      this.resource('algorithms', function() {
+        this.route(algo.get('id'));
+      });
+    });
+
+    VisualAlgo['Algorithms' + algo.get('id').capitalize() + 'Route'] = Ember.Route.extend({
+      model: function() { return algo; },
+
+      setupController: function(controller, model) {
+        controller.set('model', model);
+        controller.set('controls.model', model);
+      }
+    });
+
+    VisualAlgo['Algorithms' + algo.get('id').capitalize() + 'Controller'] = Ember.ObjectController.extend({
+      needs: "algorithms",
+      controlsBinding: 'controllers.algorithms'
+    });
   },
 
   categoryNames: function() {

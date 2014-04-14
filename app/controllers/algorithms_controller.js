@@ -1,4 +1,4 @@
-VisualAlgo.AlgorithmController = Ember.ObjectController.extend(Ember.TargetActionSupport, {
+VisualAlgo.AlgorithmsController = Ember.ObjectController.extend(Ember.TargetActionSupport, {
   algoState: null,
   finished: false,
 

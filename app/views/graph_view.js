@@ -9,7 +9,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
   showNodeValues: false,
   showEdgeValues: false,
-  disableEditingBinding: 'controller.algoState',
+  disableEditingBinding: 'controller.controls.algoState',
 
   // -------
   // graph data stored in a D3 handy way

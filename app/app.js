@@ -21,7 +21,7 @@ require('app/models/bfs');
 require('app/models/dfs');
 require('app/models/kruskal');
 
-require('app/controllers/algorithm_controller');
+require('app/controllers/algorithms_controller');
 
 require('app/views/graph_view');
 

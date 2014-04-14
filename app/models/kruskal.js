@@ -1,10 +1,6 @@
 VisualAlgo.Kruskal = VisualAlgo.GraphAlgorithm.create({
   name: "Kruskal",
 
-  inputView: Ember.View.extend({
-    templateName: '_graph_editor'
-  }),
-
   showEdgeValues: true,
 
   startAlgo: function() {

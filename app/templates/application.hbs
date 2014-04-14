@@ -23,7 +23,7 @@
               <ul class="dropdown-menu">
                 {{#each algorithms}}
                   <li>
-                    {{#link-to "algorithm" this currentWhen="algorithm"}}
+                    {{#link-to "categories" this currentWhen="algorithm"}}
                       {{name}}
                     {{/link-to}}
                   </li>
@@ -33,7 +33,7 @@
         {{/each}}
         {{#each algorithms}}
           <li>
-            {{#link-to "algorithm" this currentWhen="algorithm"}}
+            {{#link-to "categories" this currentWhen="algorithm"}}
               {{name}}
             {{/link-to}}
           </li>

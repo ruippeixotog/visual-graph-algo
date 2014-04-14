@@ -10,8 +10,6 @@ VisualAlgo.Algorithm = Ember.Object.extend(VisualAlgo.AlgorithmEvents, {
     return "algo-" + this.get('id');
   }.property('id'),
 
-  inputView: Ember.View.extend({}),
-
   startAlgo: function() {},
 
   // view-related functions; this should not be in the model
