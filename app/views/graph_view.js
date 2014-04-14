@@ -558,7 +558,7 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
       }
 
       view.get('svgNodes').attr('transform', function(d) {
-        return 'translate(' + d.x + ',' + d.y + ')';
+        return d.x && d.y ? 'translate(' + d.x + ',' + d.y + ')' : null;
       });
 
       lastTick = new Date().getTime();
