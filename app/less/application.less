@@ -1,0 +1,78 @@
+// based on SB Admin template (http://startbootstrap.com/sb-admin)
+@sidebar-width: 225px;
+
+body {
+  margin-top: 50px;
+}
+
+#content-wrapper {
+  width: 100%;
+  padding: 5px 15px;
+}
+
+// bootstrap default overrides for forms
+.form-control {
+  display: inline;
+  width: 10em;
+}
+
+// styles for sidebar in widths > 768px
+@media (min-width: 768px) {
+
+  #outer-wrapper {
+	padding-left: @sidebar-width;
+  }
+
+  #content-wrapper {
+	padding: 15px 25px;
+  }
+
+  .side-nav {
+	margin-left: -@sidebar-width;
+	left: @sidebar-width;
+	width: @sidebar-width;
+	position: fixed;
+	top: 50px;
+	height: 100%;
+	border-radius: 0;
+	border: none;
+	background-color: #222222;
+	overflow-y: auto;
+
+    // bootstrap default overrides - customized dropdowns for the side nav
+    > li.dropdown {
+
+      > ul.dropdown-menu {
+        position: relative;
+        min-width: @sidebar-width;
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        background-color: transparent;
+        box-shadow: none;
+        -webkit-box-shadow: none;
+
+        > li > a {
+          color: #999999;
+          padding: 15px 15px 15px 25px;
+
+          &:hover, &:active, &:focus {
+            color: #fff;
+            background-color: #080808;
+          }
+        }
+      }
+    }
+
+    > li > a {
+      width: @sidebar-width;
+    }
+  }
+
+  .navbar-inverse .navbar-nav > li > a {
+    &:hover, &:focus {
+      background-color: #080808;
+    }
+  }
+}
