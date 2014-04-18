@@ -1,11 +1,11 @@
 <div {{bindAttr class=domClass}}>
+  <div id="algo-wrapper">
     {{outlet}}
-
+  </div>
+  <div id="algo-controls-wrapper">
     <hr>
-
-    <div class="algo-input">
-        <button class="btn btn-default" {{action 'reset'}}>Reset</button>
-        <button class="btn btn-default" {{action 'start'}}>Start</button>
-        <button class="btn btn-default" {{action 'next'}}>Next step</button>
-    </div>
+    <button class="btn btn-default" {{action 'reset'}}>Reset</button>
+    <button class="btn btn-default" {{action 'start'}}>Start</button>
+    <button class="btn btn-default" {{action 'next'}}>Next step</button>
+  </div>
 </div>

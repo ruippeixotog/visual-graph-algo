@@ -65,11 +65,11 @@ module.exports = function(grunt) {
         tasks: ['neuter', 'regenerator']
       },
       css_stylesheets: {
-        files: ['app/css/*.css'],
+        files: ['app/css/**/*.css'],
         tasks: ['cssmin']
       },
       less_stylesheets: {
-        files: ['app/less/*.less'],
+        files: ['app/less/**/*.less'],
         tasks: ['less', 'cssmin']
       },
       handlebars_templates: {

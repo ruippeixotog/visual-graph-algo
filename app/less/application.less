@@ -1,13 +1,8 @@
 // based on SB Admin template (http://startbootstrap.com/sb-admin)
-@sidebar-width: 225px;
+@import "variables.less";
 
 body {
-  margin-top: 50px;
-}
-
-#content-wrapper {
-  width: 100%;
-  padding: 5px 15px;
+  margin-top: @titlebar-height;
 }
 
 // bootstrap default overrides for forms
@@ -17,14 +12,10 @@ body {
 }
 
 // styles for sidebar in widths > 768px
-@media (min-width: 768px) {
+@media (min-width: @sidebar-window-threshold) {
 
   #outer-wrapper {
 	padding-left: @sidebar-width;
-  }
-
-  #content-wrapper {
-	padding: 15px 25px;
   }
 
   .side-nav {
@@ -32,7 +23,7 @@ body {
 	left: @sidebar-width;
 	width: @sidebar-width;
 	position: fixed;
-	top: 50px;
+	top: @titlebar-height;
 	height: 100%;
 	border-radius: 0;
 	border: none;

@@ -1,0 +1,38 @@
+@import "variables.less";
+
+#algo-wrapper {
+  position: fixed;
+  top: @titlebar-height;
+  bottom: @controls-height;
+  left: 0;
+  right: 0;
+
+  padding: @default-padding @default-padding 0 @default-padding;
+}
+
+#algo-controls-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  padding-left: @default-padding;
+  padding-bottom: @default-padding;
+
+  background-color: white;
+
+  > hr {
+    margin-top: 0;
+  }
+}
+
+@media (min-width: @sidebar-window-threshold) {
+
+  #algo-wrapper {
+    left: @sidebar-width;
+  }
+
+  #algo-controls-wrapper {
+    left: @sidebar-width;
+  }
+}
