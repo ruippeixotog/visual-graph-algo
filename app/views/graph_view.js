@@ -1,6 +1,7 @@
-VisualAlgo.GraphView = Ember.ContainerView.extend({
+VisualAlgo.GraphView = Ember.View.extend({
   tagName: 'div',
-  childViews: ['innerView'],
+  classNames: ['inner_graph_view'],
+  elementId: 'graph-wrapper',
 
   // -------
   // graph to show (to be bound to a model/controller property)
@@ -720,11 +721,6 @@ VisualAlgo.GraphView = Ember.ContainerView.extend({
 
   // -------
   // Ember related initialization
-
-  innerView: Ember.View.extend({
-    classNames: ['inner_graph_view'],
-    elementId: 'graph-wrapper'
-  }),
 
   didInsertElement: function() {
     this.createView();

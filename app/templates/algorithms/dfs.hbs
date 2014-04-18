@@ -1,4 +1,10 @@
-{{partial "graph_editor"}}
+<div class="table-layout">
+  <div class="pivot">
+      {{partial "graph_editor"}}
+  </div>
 
-<label for="start-at">Start {{name}} at:</label>
-{{input id="start-at" type="text" value=startAt class="form-control"}}
+  <div>
+    <label for="start-at">Start {{name}} at:</label>
+    {{input id="start-at" type="text" value=startAt class="form-control"}}
+  </div>
+</div>

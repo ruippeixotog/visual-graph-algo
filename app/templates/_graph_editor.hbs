@@ -1,32 +1,36 @@
-<p>
-    Click in the open space to <b>add a node</b>, drag from one node to another to <b>add an edge</b>.
-    Ctrl-drag a node to <b>move</b> the graph layout.
-    Click a node or an edge to <b>select it</b> and <b>edit its value</b>, if applicable. <b>Delete</b> removes the selected node or edge.
-</p>
+<div class="table-layout">
+  <div class="graph-editor-desc">
+    <p>
+        Click in the open space to <b>add a node</b>, drag from one node to another to <b>add an edge</b>.
+        Ctrl-drag a node to <b>move</b> the graph layout.
+        Click a node or an edge to <b>select it</b> and <b>edit its value</b>, if applicable. <b>Delete</b> removes the selected node or edge.
+    </p>
 
-<p>
-    <label>Choose an example graph: </label>
+    <p>
+        <label>Choose an example graph: </label>
 
-    {{view Ember.Select
-           content=VisualAlgo.GraphStore.examples
-           optionLabelPath="content.name"
-           selection=VisualAlgo.GraphStore.currentExample
-           class="form-control"}}
+        {{view Ember.Select
+        content=VisualAlgo.GraphStore.examples
+        optionLabelPath="content.name"
+        selection=VisualAlgo.GraphStore.currentExample
+        class="form-control"}}
 
-    {{#if enableDirectedChoice}}
-        {{input type="checkbox" checked=graph.directed}} Directed graph
-    {{/if}}
+        {{#if enableDirectedChoice}}
+            {{input type="checkbox" checked=graph.directed}} Directed graph
+        {{/if}}
 
-    {{#if enableNodeValuesChoice}}
-        {{input type="checkbox" checked=showNodeValues}} Node weights
-    {{/if}}
+        {{#if enableNodeValuesChoice}}
+            {{input type="checkbox" checked=showNodeValues}} Node weights
+        {{/if}}
 
-    {{#if enableEdgeValuesChoice}}
-        {{input type="checkbox" checked=showEdgeValues}} Edge weights
-    {{/if}}
-</p>
+        {{#if enableEdgeValuesChoice}}
+            {{input type="checkbox" checked=showEdgeValues}} Edge weights
+        {{/if}}
+    </p>
+  </div>
 
-{{view VisualAlgo.GraphView graphBinding=graph
-                            showNodeValuesBinding=showNodeValues
-                            showEdgeValuesBinding=showEdgeValues
-                            shouldRedrawBinding=shouldRedraw}}
+  {{view VisualAlgo.GraphView graphBinding=graph
+                              showNodeValuesBinding=showNodeValues
+                              showEdgeValuesBinding=showEdgeValues
+                              shouldRedrawBinding=shouldRedraw}}
+</div>
