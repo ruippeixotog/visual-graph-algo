@@ -80,11 +80,11 @@ VisualAlgo.GraphView = Ember.View.extend({
   // D3 view components
 
   svgWidth: function() {
-    return Math.max(200, Math.min(800, this.$().width()));
+    return this.$().width();
   }.property(),
 
   svgHeight: function() {
-    return Math.max(150, Math.min(600, this.$().height()));
+    return this.$().height();
   }.property(),
 
   svg: function() {
@@ -94,9 +94,10 @@ VisualAlgo.GraphView = Ember.View.extend({
       .append('svg')
       .attr('class', 'graph')
       .attr('width', '100%')
-      .attr('height', '70%') // TODO: make the graph occupy all available space
-      .attr('viewBox', '0 0 ' + this.get('svgWidth') + ' ' + this.get('svgHeight'))
-      .attr('preserveAspectRatio', 'xMidYMid');
+      .attr('height', '100%'); // TODO: make the graph occupy all available space
+//      .attr('viewBox', '0 0 ' + this.get('svgWidth') + ' ' + this.get('svgHeight'))
+//      .attr('preserveAspectRatio', 'xMidYMid');
+
 
     // define arrow markers for graph links
     svg.append('svg:defs').append('svg:marker')
@@ -125,16 +126,12 @@ VisualAlgo.GraphView = Ember.View.extend({
 
   }.property('graph'),
 
-  onSvgResize: function() {
-    this.get('svg').attr('viewBox', '0 0 ' + this.get('svgWidth') + ' ' + this.get('svgHeight'));
-  }.observes('svgWidth', 'svgHeight'),
-
   linkDistance: function() {
-    return Math.max(75, this.get('svgWidth') * 0.1875);
+    return Math.max(75, Math.min(150, this.get('svgWidth') * 0.1875));
   }.property('svgWidth'),
 
   nodeCharge: function() {
-    return -this.get('svgWidth') * 0.625;
+    return Math.max(-500, Math.min(-200, -this.get('svgWidth') * 0.625));
   }.property('svgWidth'),
 
   forceLayout: function() {
@@ -521,6 +518,12 @@ VisualAlgo.GraphView = Ember.View.extend({
     function tick() {
       var graph = view.get('graph');
 
+      view.get('svgNodes').attr('transform', function(d) {
+//        d.x = Math.max(20, Math.min(view.get('svgWidth') - 20, d.x));
+//        d.y = Math.max(20, Math.min(view.get('svgHeight') - 20, d.y));
+        return d.x && d.y ? 'translate(' + d.x + ',' + d.y + ')' : null;
+      });
+
       // draw directed edges with proper padding from node centers
       view.get('svgLinks').attr('d', function(d) {
         var deltaX = d.target.x - d.source.x,
@@ -557,11 +560,6 @@ VisualAlgo.GraphView = Ember.View.extend({
           .attr('x', function(d) { return d.view.labelX - 25; })
           .attr('y', function(d) { return d.view.labelY - 17; });
       }
-
-      view.get('svgNodes').attr('transform', function(d) {
-        return d.x && d.y ? 'translate(' + d.x + ',' + d.y + ')' : null;
-      });
-
       lastTick = new Date().getTime();
     }
 
@@ -680,14 +678,12 @@ VisualAlgo.GraphView = Ember.View.extend({
       setTimeout(function() {
         if(t != lastResize) return;
 
-        var width = Math.max(200, Math.min(800, view.$().width()));
-        var height = Math.max(150, Math.min(600, view.$().height()));
-
-        view.set('svgWidth', width);
-        view.set('svgHeight', height);
+        view.get('forceLayout').stop();
+        view.set('svgWidth', view.$().width());
+        view.set('svgHeight', view.$().height());
         view.get('forceLayout').start();
 
-      }, 200);
+      }, 100);
     }
 
     // app starts here
