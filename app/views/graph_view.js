@@ -686,6 +686,11 @@ VisualAlgo.GraphView = Ember.View.extend({
       }, 100);
     }
 
+    function contextMenu() {
+      if(d3.event.ctrlKey) event.preventDefault();
+      return false;
+    }
+
     // app starts here
     svg.on('mousedown', mousedown)
       .on('mousemove', mousemove)
@@ -694,7 +699,8 @@ VisualAlgo.GraphView = Ember.View.extend({
     d3.select(window)
       .on('keydown', keydown)
       .on('keyup', keyup)
-      .on('resize', resize);
+      .on('resize', resize)
+      .on('contextmenu', contextMenu);
   },
 
   redraw: function() {
